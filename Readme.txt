@@ -2,13 +2,13 @@ This is a Delphi translation of the VST3 Protocol.
 It supports many of the VST3 aspects, but not all.
 The main class is TVST3Instrument which implements the functionality of a VST3 Plugin.
 It is a combined Processor/Controller and implements the following:
-- Audio proccesing (synth or effect), two channel only. 
+- Audio processing (synth or effect), two channel only. 
 - Midi CC processing
 - Parameter processing
 - Presets
 - Tempo / Playstate.
 
-Three is a simple example which implements some of the basics in an Audio Gain VST. 
+There is a simple example which implements some of the basics in an Audio Gain VST. 
 
 That's IT for the moment.
 
