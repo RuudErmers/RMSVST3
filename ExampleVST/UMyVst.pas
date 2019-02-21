@@ -2,7 +2,7 @@ unit UMyVst;
 
 interface
 
-uses UVST3Instrument,Forms;
+uses UVST3Instrument,UVST3Base,Forms;
 type TOnParameterChanged = procedure (id:integer;value:double) of object;
 
 type TMyVSTPlugin = class (TVST3Instrument)

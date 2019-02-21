@@ -2,13 +2,13 @@ unit UCPlugView;
 
 interface
 
-uses Vst3Base,Forms,UVST3Instrument;
+uses Vst3Base,Forms,UVST3Controller;
 
 type
      CPlugView = class(TInterfacedObject,IPlugView)
      FEditorForm:TForm;
 public
-      IVST3:IVST3Instrument;
+      IVST3:IVST3Controller;
       function IsPlatformTypeSupported(aType: FIDString): TResult; stdcall;
       (* The parent window of the view has been created, the
          (platform) representation of the view should now be created as well.
@@ -44,7 +44,7 @@ public
       (* On live resize this is called to check if the view can be resized to the given rect, if not adjust the rect to the allowed size. *)
       function CheckSizeConstraint(rect: PViewRect): TResult; stdcall;
 //      procedure SetParam(index:integer;value:double);
-      constructor create(controller: IVST3Instrument);
+      constructor create(controller: IVST3Controller);
   private
     end;
 
@@ -100,7 +100,7 @@ begin
   result:=kResultOk;
 end;
 
-constructor CPlugView.create(controller: IVST3Instrument);
+constructor CPlugView.create(controller: IVST3Controller);
 begin
   inherited Create;
   IVST3:=controller;

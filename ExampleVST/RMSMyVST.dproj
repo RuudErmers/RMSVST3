@@ -91,11 +91,13 @@
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <DCC_Define>CPUx86_64;CPUX64;CPU64;XSYNTHBUILD;BUILDCOMPONENTS;XREMODULAR;BUILDING_VST;$(DCC_Define)</DCC_Define>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_ExeOutput>C:\MIDI\Vst\</DCC_ExeOutput>
         <Debugger_HostApplication>C:\Program Files\REAPER (x64)\reaper.exe</Debugger_HostApplication>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
         <DCC_IOChecking>false</DCC_IOChecking>
     </PropertyGroup>
@@ -120,6 +122,9 @@
         <DCCReference Include="..\UVST3Instrument.pas"/>
         <DCCReference Include="..\UCUnitInfo.pas"/>
         <DCCReference Include="..\UCDataLayer.pas"/>
+        <DCCReference Include="..\UVST3Processor.pas"/>
+        <DCCReference Include="..\UVST3Controller.pas"/>
+        <DCCReference Include="..\UVST3Base.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

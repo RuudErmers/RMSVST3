@@ -2,12 +2,12 @@ unit UCComponent;
 
 interface
 
-uses Vst3Base,UVST3Instrument;
+uses Vst3Base,UVST3Processor;
 
 type CComponent = class(TAggregatedObject,IComponent)
 private
   FHostContext:FUnknown;
-  IVST3:IVST3Instrument;
+  IVST3:IVST3Processor;
 public
   function GetControllerClassId(var classId: TUID): TResult; stdcall;
   // Called before 'initialize' to set the component usage (optional).
@@ -33,7 +33,7 @@ public
   (** This function is called, before the plugin is unloaded and can be used for
   cleanups. You have to release all references to any host application interfaces. *)
   function Terminate: TResult; stdcall;
-  constructor Create(const Controller: TVST3Instrument);
+  constructor Create(const Controller: IVST3Processor);
 end;
 
 
@@ -49,7 +49,7 @@ begin
   result:=kResultOk;
 end;
 
-constructor CComponent.Create(const Controller: TVST3Instrument);
+constructor CComponent.Create(const Controller: IVST3Processor);
 begin
   inherited Create(controller);
   IVST3:=Controller;
@@ -90,7 +90,7 @@ function CComponent.GetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CComponent.GetState');
 // In reaper,and with a combined Component, EditController it is not needed to Getstate/SetState
-  IVST3.GetState(state,srcComponent);
+  IVST3.GetProcessorState(state);
   result:=kResultOk;
 end;
 
@@ -119,8 +119,8 @@ end;
 function CComponent.SetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CComponent.SetState');
-// In reaper,and with a combined Component, EditController it is not needed to Getstate/SetState
-  IVST3.SetState(state,srcComponent);
+// In reaper,and with a combined Component, EditController is not needed to Getstate/SetState
+  IVST3.SetProcessorState(state);
   result:=kResultTrue;
 end;
 

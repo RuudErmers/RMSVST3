@@ -2,12 +2,12 @@ unit UCAudioProcessor;
 
 interface
 
-uses Vst3Base,UVST3Instrument;
+uses Vst3Base,UVST3Base,UVST3Processor;
 
 type CAudioProcessor = class(TAggregatedObject,IAudioProcessor)
 private
   FHostContext:FUnknown;
-  IVST3:IVST3Instrument;
+  IVST3:IVST3Processor;
   FSamplerate,Ftempo:single;
   FPPQ:integer;
   FPlaying:boolean;
@@ -20,7 +20,7 @@ public
   function SetProcessing(state: TBool): TResult; stdcall;
   function Process(var data: TProcessData): TResult; stdcall;
   function GetTailSamples: uint32; stdcall;
-  constructor Create(const Controller:  TVST3Instrument);
+  constructor Create(const Controller:  IVST3Processor);
 end;
 
 implementation
@@ -36,7 +36,7 @@ begin
   if symbolicSampleSize=kSample32 then result:=kResultTrue;
 end;
 
-constructor CAudioProcessor.Create(const Controller: TVST3Instrument);
+constructor CAudioProcessor.Create(const Controller: IVST3Processor);
 begin
   inherited Create(controller);
   IVST3:=Controller;
@@ -78,17 +78,22 @@ function CAudioProcessor.Process(var data: TProcessData): TResult;
     procedure ProcessEvents;
     VAR numEvents,index:integer;
         event:TVstEvent;
+    function ToSysEx:string;
+    VAR i:integer;
+    begin
+      result:='';
+      for i:=0 to event.data.size-1 do result:=result+chr(event.data.bytes[i]);
+    end;
     begin
       numEvents:=data.inputEvents.GetEventCount;
       for index:=0 to numEvents-1 do
       begin
         data.inputEvents.GetEvent(index,event);
-        // for now, I only process NoteOn/NoteOff..
         case event.eventType of
           kNoteOnEvent       : with event.noteOn do IVST3.NoteOn(channel,pitch,round(127*velocity));
           kNoteOffEvent      :  with event.noteOff do IVST3.NoteOff(channel,pitch,round(127*velocity));
+          kDataEvent         : IVST3.SysExEvent(ToSysEx);
   (* not implemented...
-          kDataEvent         : (data: TDataEvent);
           kPolyPressureEvent : (poly: TPolyPressureEvent);
           kNoteExpressionValueEvent : (exprValue: TNoteExpressionValueEvent);
           kNoteExpressionTextEvent  : (exprText: TNoteExpressionTextEvent);  *)

@@ -2,11 +2,11 @@ unit UCEditController;
 
 interface
 
-uses Vst3Base,UCPlugView,UVST3Instrument;
+uses Vst3Base,UCPlugView,UVST3Controller;
 
 type CEditController = class(TAggregatedObject,IEditController)
       FPlugView:CPlugView;
-      IVST3:IVST3Instrument;
+      IVST3:IVST3Controller;
       // Receive the component state.
       function SetComponentState(state: IBStream): TResult; stdcall;
       // Set the controller state.
@@ -51,7 +51,7 @@ type CEditController = class(TAggregatedObject,IEditController)
       cleanups. You have to release all references to any host application interfaces. *)
       function Terminate: TResult; stdcall;
 
-      constructor Create(const Controller: TVST3Instrument);
+      constructor Create(const Controller: IVST3Controller);
 
   private
 end;
@@ -60,9 +60,9 @@ implementation
 
 { CEditController }
 
-uses CodeSiteLogging,SysUtils;
+uses CodeSiteLogging,SysUtils,UVST3Base;
 
-constructor CEditController.Create(const Controller: TVST3Instrument);
+constructor CEditController.Create(const Controller: IVST3Controller);
 begin
   inherited Create(controller);
   IVST3:=Controller;
@@ -104,7 +104,7 @@ end;
 function CEditController.GetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CEditController.GetState');
-  IVST3.GetState(state,srcController);
+  IVST3.GetEditorState(state);
   result:=kResultOk;
 end;
 
@@ -130,14 +130,14 @@ end;
 function CEditController.SetComponentHandler( handler: IComponentHandler): TResult;
 begin
   CodeSite.Send('CEditController.SetComponentHandler');
-  IVST3.SetComponentHandler(handler);
+  IVST3.SetProcessorHandler(handler);
   result:=kResultOk;
 end;
 
 function CEditController.SetComponentState(state: IBStream): TResult;
 begin
   CodeSite.Send('CEditController.SetComponentState');
-  IVST3.SetState(state,srcControllerComponent);
+  IVST3.SetProcessorState(state);
   result:=kResultOk;
 end;
 
@@ -152,7 +152,7 @@ end;
 function CEditController.SetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CEditController.SetState');
-  IVST3.SetState(state,srcController);
+  IVST3.SetEditorState(state);
   result:=kResultOk;
 end;
 

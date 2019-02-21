@@ -16,7 +16,10 @@ uses
   UCMidiMapping in '..\UCMidiMapping.pas',
   UVST3Instrument in '..\UVST3Instrument.pas',
   UCUnitInfo in '..\UCUnitInfo.pas',
-  UCDataLayer in '..\UCDataLayer.pas';
+  UCDataLayer in '..\UCDataLayer.pas',
+  UVST3Processor in '..\UVST3Processor.pas',
+  UVST3Controller in '..\UVST3Controller.pas',
+  UVST3Base in '..\UVST3Base.pas';
 
 function InitDLL:boolean; cdecl; export;
 begin

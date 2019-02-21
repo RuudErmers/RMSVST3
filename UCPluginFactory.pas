@@ -2,7 +2,7 @@ unit UCPluginFactory;
 
 interface
 
-uses Vst3Base,Generics.Collections,UVST3Instrument;
+uses Vst3Base,Generics.Collections,UVST3Base;
 
 type CPluginFactory = class(TInterfacedObject,IPluginFactory,IPluginFactory2)
 private
@@ -69,7 +69,7 @@ VAR instance:FUnknown;
     guid:TGUID;
     found:boolean;
     res:integer;
-    fPlugin:TVST3Instrument;
+    fPlugin:TVST3Base;
 begin
   CodeSite.Send('CPluginFactory.CreateInstance:'+UIDPCharToNiceString(iid));
   found:=false;

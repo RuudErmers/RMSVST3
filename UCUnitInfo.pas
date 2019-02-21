@@ -2,11 +2,11 @@ unit UCUnitInfo;
 
 interface
 
-uses Vst3Base,UCPlugView,UVST3Instrument;
+uses Vst3Base,UCPlugView,UVST3Controller;
 
 type CUnitInfo = class(TAggregatedObject,IUnitInfo)
 private
-  IVST3:IVST3Instrument;
+  IVST3:IVST3Controller;
       // Returns the flat count of units.
       function GetUnitCount: int32; stdcall;
       // Gets UnitInfo for a given index in the flat list of unit.
@@ -44,16 +44,16 @@ private
       function SetUnitProgramData(listOrUnitId: TProgramListID; programIndex: int32; data: IBStream): TResult; stdcall;
 
 public
-  constructor Create(const Controller: TVST3Instrument);
+  constructor Create(const Controller: IVST3Controller);
 end;
 
 implementation
 
 { CUnitInfo }
 
-uses CodeSiteLogging;
+uses CodeSiteLogging,UVST3Base;
 
-constructor CUnitInfo.Create(const Controller: TVST3Instrument);
+constructor CUnitInfo.Create(const Controller: IVST3Controller);
 begin
   inherited Create(controller);
   IVST3:=Controller;
