@@ -19,20 +19,20 @@ type
         procedure SetActive(active:boolean);
      end;
      TVST3Processor = class(TVST3Base,IVST3Processor)
-      protected
+      private
         Factive:boolean;
         procedure GetProcessorState(stream:IBStream);virtual;
         procedure SetProcessorState(stream:IBStream);virtual;
         procedure SetActive(active:boolean);virtual;
         procedure AutomationReceive(queue:TVST3AutomationQueue);
-
-        procedure Process32(samples,channels:integer;inputp, outputp: PPSingle);virtual;
+      public
         procedure NoteOn(channel,pitch,velocity:integer);virtual;
         procedure NoteOff(channel,pitch,velocity:integer);virtual;
         procedure SysexEvent(s:string);virtual;
+        procedure Process32(samples,channels:integer;inputp, outputp: PPSingle);virtual;
         procedure SamplerateChanged(samplerate:single);virtual;
-        procedure TempoChanged(tempo:single);virtual;
         procedure PlayStateChanged(playing:boolean;ppq:integer);virtual;
+        procedure TempoChanged(tempo:single);virtual;
         procedure OnAutomationReceived(queue:TVST3AutomationQueue);virtual;
         procedure OnMidiCC(channel,cc,value:integer);virtual;
    end;
@@ -62,7 +62,7 @@ begin
   begin
     index:=queue.id-MIDICC_SIMULATION_START;
     for i:=0 to queue.Count-1 do
-      OnMidiCC(index DIV 128, index MOD 128,round(127*queue.get(i).value))
+      OnMidiCC(index DIV 128, index MOD 128,round(127*queue[i].value))
   end
   else
     OnAutomationReceived(queue);
@@ -70,6 +70,7 @@ end;
 
 procedure TVST3Processor.Process32(samples, channels: integer; inputp,  outputp: PPSingle);
 begin
+// virtual;
 end;
 
 procedure TVST3Processor.SamplerateChanged(samplerate: single);
@@ -99,7 +100,7 @@ end;
 
 procedure TVST3Processor.SysexEvent(s: string);
 begin
-
+// virtual;
 end;
 
 procedure TVST3Processor.PlayStateChanged(playing: boolean; ppq: integer);

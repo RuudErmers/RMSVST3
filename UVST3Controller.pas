@@ -61,14 +61,12 @@ type TVST3Parameter  = record
         procedure saveCurrentToProgram(prgm:integer);
         procedure SetPreset(prgm:integer;saveCurrent:boolean;updateComponent:boolean);
         function ParmLookup(id: integer): integer;
-
-   protected
         function CreateForm(parent:pointer):Tform;
         procedure EditOpen(form:TForm);
         procedure EditClose;
         function GetParameterCount:integer;
         function GetParameterInfo(paramIndex: integer;VAR info: TParameterInfo):boolean;
-        function getParameterValue(id:integer):double;
+
         function GetParamStringByValue(id: integer; valueNormalized: double): string;
         procedure GetEditorState(stream:IBStream);
         procedure SetEditorState(stream:IBStream);
@@ -84,18 +82,21 @@ type TVST3Parameter  = record
         procedure OnCreate(pluginInfo:TVST3InstrumentInfo);override;
         function GetNumPrograms:integer;
         function GetProgramName(index:integer):string;
-
+   protected
+        function  getParameterValue(id:integer):double;
         procedure AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;presetChange:boolean=false);
+        procedure ResendParameters;
+        procedure UpdateHostParameter(id:integer;value:double);
+        property  EditorForm: TForm read FEditorForm;
+
         procedure OnPresetChange(prgm:integer);virtual;
-        function GetEditorClass: TFormClass;virtual;
+        function  GetEditorClass: TFormClass;virtual;
         procedure OnEditOpen;virtual;
         procedure OnEditClose;virtual;
-        procedure ResendParameters;
         procedure UpdateEditorParameter(id:integer;value:double);virtual;
         procedure OnInitialize;virtual;
         procedure OnFinalize;virtual;
-        property EditorForm: TForm read FEditorForm;
-        procedure UpdateHostParameter(id:integer;value:double);
+   public
         constructor Create; override;
    end;
 
@@ -286,6 +287,7 @@ end;
 function TVST3Controller.getParameterValue(id: integer): double;
 VAR index:integer;
 begin
+  result:=0;
   index:=ParmLookup(id);
   if index < 0 then exit;
   result:=Fparameters[index].value;

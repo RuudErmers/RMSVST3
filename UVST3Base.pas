@@ -37,6 +37,7 @@ type
                            private
                              Fid:integer;
                              FList:TList<TVST3AutomationItem>;
+                             function get(index:integer):TVST3AutomationItem;
                            public
                              procedure Add(sampleOffset:integer;value:double);
                              constructor Create(id:integer);
@@ -44,7 +45,7 @@ type
                              property id: integer read FId;
                              function last:double;
                              function count:integer;
-                             function get(index:integer):TVST3AutomationItem;
+                             property value[index:integer]:TVST3AutomationItem read get;default;
                            end;
     IVST3Base = interface
         function GetPluginInfo:TVST3InstrumentInfo;
