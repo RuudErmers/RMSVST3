@@ -12,6 +12,7 @@ const ID_PULSEWIDTH = 19;
 type TMyVSTPlugin = class (TVSTInstrument)
 private
   FSimpleSynth:TSimpleSynth;
+protected
   procedure Process32(samples,channels:integer;inputp, outputp: PPSingle);override;
   procedure UpdateProcessorParameter(id:integer;value:double);override;
   procedure OnInitialize;override;
@@ -20,7 +21,6 @@ private
   procedure OnPresetChange(prgm:integer);override;
   procedure OnMidiEvent(byte0, byte1, byte2: integer);override;
   procedure onKeyEvent(key: integer; _on: boolean);
-protected
 public
 end;
 

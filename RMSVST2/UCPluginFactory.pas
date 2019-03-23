@@ -38,7 +38,7 @@ interface
 ////////////////////////////////////////////////////////////////////////////////
 
 uses
-  Classes, Forms, Sysutils,  DAV_VSTEffect,CodeSiteLogging,UVSTBase;
+  Classes, Forms, Sysutils,  DAVVSTEffect,CodeSiteLogging,UVSTBase;
 
 {$define DebugLog}
 
@@ -91,8 +91,8 @@ type
 
     property AudioMaster: TAudioMasterCallbackFunc read FAudioMaster write FAudioMaster;
   public
-    constructor Create; override;
     destructor Destroy; override;
+    constructor Create; override;
     property Effect: PVSTEffect read GetEffect;
   end;
 
@@ -184,8 +184,6 @@ begin
 end;
 
 destructor TBasicVSTModule.Destroy;
-var
-  Index : Integer;
 begin
  try
   {$IFDEF DebugLog}

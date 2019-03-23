@@ -18,6 +18,7 @@ type TBaseOscillator = class(TObject)
   end;
 
 type TOscillatorBlep = class(TBaseOscillator)
+  protected
     function ValueAt(FxPos:double): double;override; // FxPos: 0..1
   private
     function PolyBlep(t: double): double;
@@ -30,6 +31,7 @@ type
     FPulseWidth : double;
     function PulseWidthAdjusted(FxPos:double): double;
     procedure SetPulseWidth(value:double);
+  protected
     function ValueAt(FxPos:double): double;override;
   public
     property PulseWidth:double read FPulseWidth write SetPulseWidth;
@@ -116,7 +118,6 @@ begin
 end;
 
 constructor TOscillator.Create(const SampleRate: double);
-VAR i:integer;
 begin
   inherited;
   FPulseWidth:=0.5;
@@ -208,7 +209,7 @@ begin
 end;
 
 procedure TMusicDspMoog.Reset;
-VAR ch,i:integer;
+VAR i:integer;
 begin
   for i:=0 to 3 do
     begin

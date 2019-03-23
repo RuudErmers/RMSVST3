@@ -109,6 +109,28 @@ begin
   Result := TRMSFruityPlug.Create(Tag, Host,pluginInfo);
 end;
 
+// Two deprecated AnsiString constructions..
+procedure AssignString(ptr:pAnsiChar;s:string);overload;
+VAR i:integer;
+begin
+  for i:=1 to length(s) do
+  begin
+    ptr^:=AnsiChar(s[i]);
+    inc(ptr);
+  end;
+end;
+
+function AssignString(ptr:pAnsiChar):string;overload;
+begin
+  result:='';
+  while ptr^<>#0 do
+  begin
+    result:=result+Char(ptr^);
+    inc(ptr);
+  end;
+end;
+
+
 // create the object
 constructor TRMSFruityPlug.Create(SetTag:Integer; Host: TFruityPlugHost;pluginInfo:TVSTInstrumentInfo);
 VAR FeditorFormClass:TFormClass;
@@ -119,8 +141,8 @@ begin
   fPlugin.OnCreate(pluginInfo);
   fPlugin.ControllerInitialize(self);
   PlugInfo.NumParams:=length(fPlugin.FParameters);
-  StrPCopy(FLongName,pluginInfo.PluginDef.name+'('+pluginInfo.factoryDef.vendor+')');
-  StrPCopy(FShortName,pluginInfo.PluginDef.name);
+  AssignString(FLongName,pluginInfo.PluginDef.name+'('+pluginInfo.factoryDef.vendor+')');
+  AssignString(FShortName,pluginInfo.PluginDef.name);
   Info := @PlugInfo;
   PlugInfo.LongName:=@FLongName[0];
   PlugInfo.ShortName:=@FShortName[0];
@@ -295,9 +317,6 @@ end;
 
 // params
 function TRMSFruityPlug.ProcessParam(ThisIndex, ThisValue, RECFlags: integer): integer;
-var
-   o, i : integer;
-   v    : single;
 begin
   if RECFlags and REC_FromMIDI <> 0 then
        ThisValue:=TranslateMIDI(ThisValue, 0, 65535);
@@ -362,7 +381,7 @@ procedure TRMSFruityPlug.GetName(Section, Index, Value: integer; Name: PAnsiChar
 begin
   case Section of
     FPN_Param:
-      StrPCopy(Name, fPlugin.FParameters[index].shorttitle);
+      AssignString(Name, fPlugin.FParameters[index].shorttitle);
 // todo.. someday...     FPN_ParamValue: fPlugin.getParameterAsString()
   end;
 end;

@@ -5,7 +5,6 @@ library RMSMyVST3;
 
 uses
   UCPluginFactory in 'UCPluginFactory.pas',
-  Vst3Base in 'Vst3Base.pas',
   UUIDHelper in 'UUIDHelper.pas',
   UCEditController in 'UCEditController.pas',
   UCAudioProcessor in 'UCAudioProcessor.pas',
@@ -21,7 +20,8 @@ uses
   UMyVst in '..\SimpleSynthCommon\UMyVst.pas',
   UMyVSTForm in '..\SimpleSynthCommon\UMyVSTForm.pas' {FormMyVST},
   UPianoKeyboard in '..\SimpleSynthCommon\UPianoKeyboard.pas',
-  UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas';
+  UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas',
+  Vst3Base in 'Vst3Base.pas';
 
 function InitDLL:boolean; cdecl; export;
 begin

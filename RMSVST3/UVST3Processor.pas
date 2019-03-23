@@ -22,14 +22,13 @@ type
      TVST3Processor = class(TVSTBase,IVST3Processor)
       private
         Factive:boolean;
-        procedure GetProcessorState(stream:IBStream);virtual;
-        procedure SetProcessorState(stream:IBStream);virtual;
-        procedure SetActive(active:boolean);virtual;
+        procedure GetProcessorState(stream:IBStream);
+        procedure SetProcessorState(stream:IBStream);
+        procedure SetActive(active:boolean);
       protected
         procedure ProcessorInitialize;virtual;
         procedure ProcessorTerminate;virtual;
         procedure ProcessorParameterSetValue(id:integer;value:double);virtual;
-      public
         procedure OnSysexEvent(s:string);virtual;
         procedure OnMidiEvent(byte0,byte1,byte2:integer);virtual;
         procedure Process32(samples,channels:integer;inputp, outputp: PPSingle);virtual;
@@ -37,6 +36,7 @@ type
         procedure PlayStateChanged(playing:boolean;ppq:integer);virtual;
         procedure TempoChanged(tempo:single);virtual;
         procedure UpdateProcessorParameter(id:integer;value:double);virtual;
+      public
    end;
 
 
@@ -91,12 +91,12 @@ end;
 
 procedure TVST3Processor.GetProcessorState(stream: IBStream);
 begin
-//  virtual;
+// Not implemented, no need for
 end;
 
 procedure TVST3Processor.SetProcessorState(stream: IBStream);
 begin
-//  virtual;
+// Not implemented, no need for
 end;
 
 procedure TVST3Processor.OnSysexEvent(s: string);

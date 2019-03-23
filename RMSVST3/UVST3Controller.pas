@@ -54,7 +54,7 @@ type TVST3Parameter  = record
         function GetNumPrograms:integer;
         function GetProgramName(index:integer):string;
      end;
-   TVST3Controller = class(TVST3Processor,IVST3Controller)
+   TVST3Controller = class(TVST3Processor,IVST3Controller,IVST3Processor)
    private
         FCurPreset:integer;
         FPrograms: TList<TVST3Program>;
@@ -82,11 +82,6 @@ type TVST3Parameter  = record
         procedure Terminate;
         procedure ControllerInitialize;
         procedure ControllerTerminate;
-        procedure ProcessorInitialize;override;
-        procedure ProcessorTerminate;override;
-
-        procedure ProcessorParameterSetValue(id:integer;value:double);override;
-
         function NormalizedParamToPlain(id:integer;  valueNormalized: double): double;
         function PlainParamToNormalized(id:integer; plainValue: double): double;
         procedure SetProcessorHandler( handler: IProcessorHandler);
@@ -101,6 +96,9 @@ type TVST3Parameter  = record
         procedure InternalSetParameter(const Index: Integer;  const Value: Single;updateProcessor:boolean);
 
    protected
+        procedure ProcessorInitialize;override;final;
+        procedure ProcessorTerminate;override;final;
+        procedure ProcessorParameterSetValue(id:integer;value:double);override;final;
         procedure AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;presetChange:boolean=false);
         procedure ResendParameters;
         procedure UpdateHostParameter(id:integer;value:double);
@@ -340,9 +338,9 @@ begin
     exit;
   end;
   info.id:=Fparameters[paramIndex].id;
-  AssignStrToStr128(info.Title,Fparameters[paramIndex].Title);
-  AssignStrToStr128(info.shortTitle,Fparameters[paramIndex].shortTitle);
-  AssignStrToStr128(info.units,Fparameters[paramIndex].units);
+  AssignString(info.Title,Fparameters[paramIndex].Title);
+  AssignString(info.shortTitle,Fparameters[paramIndex].shortTitle);
+  AssignString(info.units,Fparameters[paramIndex].units);
   info.stepCount:=Fparameters[paramIndex].steps;
   info.defaultNormalizedValue:=Fparameters[paramIndex].defVal;
   info.unitId:= kRootUnitId;
@@ -430,7 +428,6 @@ end;
 
 procedure TVST3Controller.ResendParameters;
 VAR i,id,count:integer;
-    value:double;
 begin
   if FeditorForm=NIL then exit;
   count:=FnumUserParameters;
@@ -439,17 +436,18 @@ begin
     id:=Fparameters[i].id;
     if isMidiCCId(id) then continue;  // better safe than sorry
     if id = IDPARMPRESET then continue;  // better safe than sorry
-    value:=GetParameterValue(id);
-    UpdateEditorParameter(id,value);
+    UpdateEditorParameter(id,Fparameters[i].value);
+    Fparameters[i].dirty:=false
   end;
 end;
 
 procedure TVST3Controller.TimerOnIdle(Sender:TObject);
-VAR i:integer;
+VAR i,count:integer;
 begin
   OnEditIdle;
   if not FSomethingDirty then exit;
-  for i:=0 to length(Fparameters)-1 do
+  count:=FnumUserParameters;
+  for i:=0 to count-1 do
     if Fparameters[i].dirty then
     begin
       UpdateEditorParameter(Fparameters[i].id,Fparameters[i].value);
@@ -543,7 +541,7 @@ end;
 procedure TVST3Controller.ControllerParameterSetValue(id: integer; value: double);
 { this is called: From Host: ParameterSetValue}
 // All CC's for MIdi are called
-VAR index,ind:integer;
+VAR index:integer;
 const   MIDI_CC = $B0;
 begin
   CodeSite.Send('ControllerParameterSetValue:'+id.ToString+' '+value.ToString);
@@ -566,7 +564,7 @@ begin
 end;
 
 procedure TVST3Controller.ProcessorParameterSetValue(id:integer;value:double);
-VAR i,index:integer;
+VAR index:integer;
 const   MIDI_CC = $B0;
 begin
 // not from ui.. !! CodeSite.Send('ProcessorOnUpdateParameter: '+id.ToString+' '+value.ToString);
@@ -626,7 +624,7 @@ end;
 // retrieves value from sl, using paramDEF.IDs as key
 // adjusts length(values) if needed
 procedure TVST3Program.SetState(const paramDEF:TVST3ParameterArray;numParams:integer;sl:TDataLayer);
-VAR i,dummy:integer;
+VAR i:integer;
 begin
   // Copy To self
   if sl.getAttributeI('MAGIC')<>2136 then

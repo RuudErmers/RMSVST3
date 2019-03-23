@@ -76,7 +76,7 @@ begin
   begin
     info.id := IDPARMPRESET;
     info.programCount := IVST3.GetNumPrograms;
-    AssignStrToStr128 (info.name, 'Factory Presets');
+    AssignString(info.name, 'Factory Presets');
     result:=kResultTrue;
   end
   else
@@ -85,7 +85,7 @@ end;
 
 function CUnitInfo.GetProgramName(listId: TProgramListID; programIndex: int32;  name: PString128): TResult;
 begin
-   AssignStrToStr128(name^,IVST3.GetProgramName(programIndex));
+   AssignString(name^,IVST3.GetProgramName(programIndex));
   result:=kResultOk;
 end;
 
@@ -117,7 +117,7 @@ begin
     info.id             := kRootUnitId;
     info.parentUnitId   := kNoParentUnitId;
     info.programListId  := kNoProgramListId;
-    AssignStrToStr128(info.name,'Root Unit');
+    AssignString(info.name,'Root Unit');
     result:=kResultTrue;
   end
   else

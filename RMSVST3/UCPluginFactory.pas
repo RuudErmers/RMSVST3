@@ -13,8 +13,8 @@ private
   function CountClasses: int32;  stdcall;
   function GetClassInfo(index: int32; var info: TPClassInfo): TResult;  stdcall;
   function CreateInstance(cid, iid: PAnsiChar; var obj: pointer): TResult;  stdcall;
-  function GetClassInfoUnicode(index: int32; var info: TPClassInfoW): TResult;  stdcall;
-  function SetHostContext(context: FUnknown): TResult;  stdcall;
+// IPluginFactory3  function GetClassInfoUnicode(index: int32; var info: TPClassInfoW): TResult;  stdcall;
+// IPluginFactory3  function SetHostContext(context: FUnknown): TResult;  stdcall;
   function GetClassInfo2(index: int32; var info: TPClassInfo2): TResult; stdcall;
 public
   constructor Create(pluginInfo:TVSTInstrumentInfo);
@@ -43,9 +43,9 @@ begin
   fPluginInfo:=pluginInfo;
   with fPlugInInfo.factoryDef do
   begin
-    StrPCopy(factoryInfo.vendor,vendor);
-    StrPCopy(factoryInfo.url,url);
-    StrPCopy(factoryInfo.email,email);
+    AssignString(factoryInfo.vendor,vendor);
+    AssignString(factoryInfo.url,url);
+    AssignString(factoryInfo.email,email);
   end;
 
   with fClassInfo2 do
@@ -53,7 +53,7 @@ begin
       cid := TUID(pluginInfo.PluginDef.vst3id);
       cardinality:=     kManyInstances;
       category:=        kVstAudioEffectClass;
-      StrPCopy(name,    pluginInfo.PluginDef.name);
+      AssignString(name,    pluginInfo.PluginDef.name);
       classFlags:=      0;
       if pluginInfo.PluginDef.isSynth then
         subCategories:= kInstrument
@@ -121,47 +121,14 @@ begin
   result:=kResultOK;
 end;
 
-function CPluginFactory.GetClassInfoUnicode(index: int32; var info: TPClassInfoW): TResult;
-begin
-  CodeSite.Send('GetClassInfoUnicode');
-end;
-
 function CPluginFactory.MYGetFactoryInfo(var info: TPFactoryInfo): TResult;
 begin
   info:=factoryInfo;
   result:=kResultOK;
 end;
 
-function CPluginFactory.SetHostContext(context: FUnknown): TResult;
-begin
-(* JUCE Version
-        host.loadFrom (context);
-
-        if (host != nullptr)
-        {
-            Vst::String128 name;
-            host->getName (name);
-
-            return kResultTrue;
-        }
-
-        return kNotImplemented;
-   JUCE Version *)
-  result:=kResultTrue;
-end;
-
-
-VAR gPluginFactory:CPluginFactory;
-
 function CreatePlugin(pluginInfo:TVSTInstrumentInfo): pointer;stdcall;
 begin
-(*
-  if gPluginFactory=NIL then
-    gPluginFactory:=CPluginFactory.Create(pluginInfo)
-   else
-     IPluginFactory(gPluginFactory)._addRef;
-  result:=IPluginFactory(gPluginFactory);
-*)
   result:=IPluginFactory(CPluginFactory.Create(pluginInfo));
 end;
 

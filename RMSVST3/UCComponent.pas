@@ -96,12 +96,12 @@ end;
 
 function CComponent.Initialize(context: FUnknown): TResult;
 begin
+  result:=kResultOk;
   CodeSite.Send('CComponent.Initialize');
   if FhostContext <> NIL then exit;
   FHostContext:=context;
   FHostContext._addRef;
   IVST3.ProcessorInitialize;
-  result:=kResultOk;
 end;
 
 function CComponent.SetActive(state: TBool): TResult;

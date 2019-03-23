@@ -92,7 +92,7 @@ end;
 
 function CEditController.GetParamStringByValue(tag: TParamID;  valueNormalized: TParamValue; text: PString128): TResult;
 begin
-  AssignStrToStr128(text^,IVST3.GetParamStringByValue(tag,valueNormalized));
+  AssignString(text^,IVST3.GetParamStringByValue(tag,valueNormalized));
   result:=kResultOk;
 end;
 

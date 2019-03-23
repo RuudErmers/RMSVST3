@@ -3,7 +3,7 @@ unit UVSTInstrument;
 interface
 
 uses
-  Classes, Forms, Sysutils, DAV_VSTEffect,CodeSiteLogging,UVSTBase,UCPluginFactory,Generics.Collections,UCDataLayer;
+  Classes, Forms, Sysutils, DAVVSTEffect,CodeSiteLogging,UVSTBase,UCPluginFactory,Generics.Collections,UCDataLayer;
 
 {$define DebugLog}
 
@@ -48,9 +48,6 @@ type TVST2Instrument = class(TBasicVSTModule)
     function HostCallGetVendorString(const Index: Integer;
       const Value: TVstIntPtr; const ptr: Pointer;
       const opt: Single): TVstIntPtr;
-    function HostCallSetProcessPrecision(const Index: Integer;
-      const Value: TVstIntPtr; const ptr: Pointer;
-      const opt: Single): TVstIntPtr;
     function HostCallEditOpen(const Index: Integer; const Value: TVstIntPtr;
       const ptr: Pointer; const opt: Single): TVstIntPtr;
     function HostCallEditGetRect(const Index: Integer; const Value: TVstIntPtr;
@@ -72,8 +69,6 @@ type TVST2Instrument = class(TBasicVSTModule)
       const ptr: pointer; const opt: Single): TVstIntPtr;
     procedure saveCurrentToProgram(prgm:integer);
     procedure UpdateCurrentFromProgram(prgm: integer; updateComponent: boolean);
-    function HostCallClose(const Index: Integer; const Value: TVstIntPtr;
-      const ptr: pointer; const opt: Single): TVstIntPtr;
     function HostCallEditIdle(const Index: Integer; const Value: TVstIntPtr;
       const ptr: pointer; const opt: Single): TVstIntPtr;
     function HostCallProcessEvents(const Index: Integer;
@@ -84,19 +79,19 @@ type TVST2Instrument = class(TBasicVSTModule)
     procedure SetPreset(prgm:integer;saveCurrent:boolean;updateComponent:boolean);
     function HostCallGetChunk(const Index: Integer; const Value: TVstIntPtr; const PTR: Pointer; const opt: Single): TVstIntPtr; virtual;
     function HostCallSetChunk(const Index: Integer; const Value: TVstIntPtr; const PTR: Pointer; const opt: Single): TVstIntPtr; virtual;
-    procedure HostCallProcess32Replacing(const Inputs, Outputs: PPSingle; const SampleFrames: Cardinal); override;
-    function  HostCallGetParameter(const Index: Integer): Single; override;
-    procedure HostCallSetParameter(const Index: Integer; const Value: Single); override;
     function  HostCallCanDo(const Index: Integer; const Value: TVstIntPtr; const ptr: Pointer; const opt: Single): TVstIntPtr;
-    function  HostCallDispatchEffect(const Opcode: TDispatcherOpcode; const Index: Integer; const Value: TVstIntPtr; const PTR: Pointer; const opt: Single): TVstIntPtr; override;
     function HostCallGetParamLabel(const Index: Integer;
       const Value: TVstIntPtr; const ptr: pointer;
       const opt: Single): TVstIntPtr;
     procedure InternalSetParameter(const Index: Integer; const Value: Single);
-    function getParameterValue(id: integer): double;
     function CreateEditor: TForm;
 //////////////////////////
 protected
+    function HostCallClose(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;override;final;
+    procedure HostCallProcess32Replacing(const Inputs, Outputs: PPSingle; const SampleFrames: Cardinal); override;final;
+    function  HostCallGetParameter(const Index: Integer): Single; override;final;
+    procedure HostCallSetParameter(const Index: Integer; const Value: Single); override;final;
+    function  HostCallDispatchEffect(const Opcode: TDispatcherOpcode; const Index: Integer; const Value: TVstIntPtr; const PTR: Pointer; const opt: Single): TVstIntPtr; override;final;
 
     procedure AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;presetChange:boolean=false);
     procedure ResendParameters;
@@ -105,7 +100,6 @@ protected
     procedure UpdateProcessorParameter(id:integer;value:double);virtual;
     procedure OnInitialize; virtual;
     procedure OnFinalize;virtual;
-    procedure OnCreate(pluginInfo:TVSTInstrumentInfo);override;
     procedure OnEditOpen;virtual;
     procedure OnEditClose;virtual;
     procedure OnEditIdle;virtual;
@@ -119,9 +113,9 @@ protected
     procedure SamplerateChanged(samplerate:single);override;
     procedure TempoChanged(tempo: single);override;
     property EditorForm: TForm read FEditorForm;
-    constructor create;override;
 public
-
+    procedure OnCreate(pluginInfo:TVSTInstrumentInfo);override;
+    constructor Create;override;
 end;
 
 type TVSTInstrument = TVST2Instrument;  // don't expand this type with own methods!
@@ -132,6 +126,27 @@ uses
   Math,  Windows;
 
 { TVST2Instrument }
+
+// Two deprecated AnsiString constructions..
+procedure AssignString(ptr:pAnsiChar;s:string);overload;
+VAR i:integer;
+begin
+  for i:=1 to length(s) do
+  begin
+    ptr^:=AnsiChar(s[i]);
+    inc(ptr);
+  end;
+end;
+
+function AssignString(ptr:pAnsiChar):string;overload;
+begin
+  result:='';
+  while ptr^<>#0 do
+  begin
+    result:=result+Char(ptr^);
+    inc(ptr);
+  end;
+end;
 
 {$POINTERMATH ON}
 
@@ -223,7 +238,6 @@ begin
 end;
 
 constructor TVST2Instrument.create;
-VAR i:integer;
 begin
   inherited;
   Fchunk:=NIL;
@@ -345,16 +359,17 @@ end;
 
 function TVST2Instrument.HostCallCanDo(const Index: Integer;
   const Value: TVstIntPtr; const ptr: Pointer; const opt: Single): TVstIntPtr;
+VAR s:string;
 begin
- Result := 0;
- {$IFDEF DebugLog} CodeSite.Send('TVST2Instrument.HostCallCanDo (' + StrPas(PAnsiChar(ptr)) + ')'); {$ENDIF}
-  if StrComp(PAnsiChar(ptr), 'receiveVstEvents')      = 0 then Result := 1 else
-  if StrComp(PAnsiChar(ptr), 'receiveVstMidiEvent')   = 0 then Result := 1 else
-  if StrComp(PAnsiChar(ptr), 'receiveVstTimeInfo')    = 0 then Result := 1 else
-  if StrComp(PAnsiChar(ptr), 'sendVstMidiEvent')      = 0 then Result := 1 else
-  if StrComp(PAnsiChar(ptr), '2in2out')               = 0 then Result :=  1 else
-  if StrComp(PAnsiChar(ptr), 'midiProgramNames')      = 0 then Result := 1 else
-    result:=-1;
+ {$IFDEF DebugLog} CodeSite.Send('TVST2Instrument.HostCallCanDo (' + String(PAnsiChar(ptr)) + ')'); {$ENDIF}
+  s:=AssignString(ptr);
+  if s='receiveVstEvents'    then Result := 1 else
+  if s='receiveVstMidiEvent' then Result := 1 else
+  if s='receiveVstTimeInfo'  then Result := 1 else
+  if s='sendVstMidiEvent'    then Result := 1 else
+  if s='2in2out'             then Result := 1 else
+  if s='midiProgramNames'    then Result := 1 else
+    Result:=-1;
 end;
 
 function TVST2Instrument.HostCallDispatchEffect(const Opcode: TDispatcherOpcode;
@@ -365,7 +380,6 @@ begin
  {$IFDEF DebugLog} if opCode<>effProcessEvents then CodeSite.Send('TVST2Instrument.HostCallDispatchEffect (' +ord(opCode).ToString+ ')'); {$ENDIF}
   case opcode of
     effCanDo:           Result := HostCallCanDo(Index, Value, PTR, opt);
-    effClose:           Result := HostCallClose(Index, Value, PTR, opt);
     effEditOpen:        Result := HostCallEditOpen(Index, Value, PTR, opt);
     effEditClose:       Result := HostCallEditClose(Index, Value, PTR, opt);
     effEditGetRect:     Result := HostCallEditGetRect(Index, Value, PTR, opt);
@@ -421,7 +435,7 @@ VAR i:integer;
 begin
   s:='';
   for i:=0 to MidiSysExEvent.DumpBytes-1 do
-    s:=s+MidiSysExEvent.SysExDump[i];
+    s:=s+Char(MidiSysExEvent.SysExDump[i]);
   OnSysExEvent(s);
 end;
 
@@ -435,6 +449,7 @@ end;
 function TVST2Instrument.HostCallEditIdle(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;
 VAR i:integer;
 begin
+  Result := 0;
   if FEditorForm<>NIL then
     OnEditIdle;
   if not FSomethingDirty then exit;
@@ -445,7 +460,6 @@ begin
       Fparameters[i].dirty:=false
     end;
   FSomethingDirty:=false;
-  Result := 0;
 end;
 
 function TVST2Instrument.getParameterAsString(id:integer;value:double):string;
@@ -456,9 +470,10 @@ end;
 
 function TVST2Instrument.HostCallGetParamDisplay(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;
 var
-  Str : AnsiString;
+  Str : String;
   v:double;
 begin
+  result:=0;
   v:=Fparameters[index].value;
   Str:=getParameterAsString(index,v);
   if Str='' then
@@ -470,38 +485,34 @@ begin
        else
          Str:=Copy(FloatToStr(v),1,6);
      end;
- StrPCopy(Ptr, Str);
+ AssignString(Ptr, Str);
 end;
 
 function TVST2Instrument.HostCallGetParamLabel(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;
 var
-  Str : AnsiString;
+  Str : String;
 begin
    Str:=Fparameters[index].units;
-   StrPCopy(Ptr, Str);
+   AssignString(Ptr, Str);
+   result:=0;
 end;
 
 function TVST2Instrument.HostCallGetParamName(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;
 begin
-  StrPCopy(Ptr, AnsiString(FParameters[Index].title));
+  AssignString(Ptr, FParameters[Index].title);
+  Result := 0;
 end;
 
 function TVST2Instrument.HostCallClose(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;
 begin
   OnFinalize;
-end;
-
-
-function TVST2Instrument.HostCallSetProcessPrecision(const Index: Integer; const Value: TVstIntPtr; const ptr: Pointer; const opt: Single): TVstIntPtr;
-begin
-// {$IFDEF DebugLog} CodeSite.Send('TVST2Instrument.HostCallSetProcessPrecision'); {$ENDIF}
-// Result := Integer(fProcessPrecisition); // [value]: @see VstProcessPrecision  @see AudioEffectX::setProcessPrecision
+  Result := 0;
 end;
 
 function TVST2Instrument.HostCallGetProgramName(const Index: Integer; const Value: TVstIntPtr; const ptr: pointer; const opt: Single): TVstIntPtr;
 begin
  {$IFDEF DebugLog} CodeSite.Send('TVST2Instrument.HostCallGetProgramName'+inttostr(Value)); {$ENDIF}
-  StrPCopy(Ptr, AnsiString('Preset '+format('%.2d',[FCurPreset+1])));
+  AssignString(Ptr, 'Preset '+format('%.2d',[FCurPreset+1]));
   Result:=0;
 end;
 
@@ -583,7 +594,7 @@ const STATE_MAGIC = 346523;
 const MAGIC_DL =42977;
 function TVST2Instrument.HostCallGetChunk(const Index: Integer;
   const Value: TVstIntPtr; const PTR: Pointer; const opt: Single): TVstIntPtr;
-VAR i,n:integer;
+VAR i:integer;
     sl,ssl:TDataLayer;
 
   procedure SaveTochunk(s:string);
@@ -635,6 +646,7 @@ begin
     if STATE_MAGIC<>sl.getAttributeI('Magick') then
     begin
       CodeSite.Send('Set State Error: ');
+      Result := 0;
       exit;
     end;
 
@@ -657,7 +669,7 @@ begin
  Result := 0;
  if Assigned(ptr) then
   begin
-   StrPCopy(ptr, AnsiString(GetPluginInfo.PluginDef.name));
+   AssignString(ptr, GetPluginInfo.PluginDef.name);
    Result := 1;
   end;
 end;
@@ -668,18 +680,9 @@ begin
  Result := 0;
  if Assigned(ptr) then
   begin
-   StrPCopy(ptr,AnsiString(GetPluginInfo.factoryDef.vendor));
+   AssignString(ptr,GetPluginInfo.factoryDef.vendor);
    Result := 1;
   end;
-end;
-
-function TVST2Instrument.getParameterValue(id: integer): double;
-VAR index:integer;
-begin
-  result:=0;
-  index:=ParmLookup(id);
-  if index < 0 then exit;
-  result:=Fparameters[index].value;
 end;
 
 procedure TVST2Instrument.HostCallProcess32Replacing(const Inputs,
@@ -728,7 +731,7 @@ end;
 // adjusts length(values) if needed
 
 procedure TVST3Program.SetState(paramDEF:TVST3ParameterArray;numParams:integer;sl:TDataLayer);
-VAR i,dummy:integer;
+VAR i:integer;
 begin
   // Copy To self
   if sl.getAttributeI('MAGIC')<>2136 then

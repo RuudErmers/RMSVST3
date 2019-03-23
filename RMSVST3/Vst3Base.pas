@@ -3216,18 +3216,30 @@ const
 const
      kAttributesFlagsHideableFlag = 'hideable';  // the associated layer marked as hideable allows a remote to hide or make it not usable a parameter when the associated value is inactive
 
-procedure AssignStrToStr128(VAR target: TString128; source:string);
+procedure AssignString(VAR target: array of AnsiChar; source:string);overload;
+procedure AssignString(VAR target: array of TChar; source:string);overload;
 
 implementation
 
 
-procedure AssignStrToStr128(VAR target: TString128; source:string);
-VAR i:integer;
+procedure AssignString(VAR target: array of TChar; source:string);
+VAR i,l:integer;
 begin
-  for i:=0 to length(source)-1 do
+  l:=length(source);
+  if l>=high(target) then l:=high(target)-1;
+  for i:=0 to l-1 do
     target[i]:=source[i+1];
-  target[length(source)]:=#0;
+  target[l]:=#0;
 end;
 
-
+procedure AssignString(VAR target: array of AnsiChar; source:string);
+VAR i,l:integer;
+begin
+  l:=length(source);
+  if l>=high(target) then l:=high(target)-1;
+  for i:=0 to l-1 do
+    target[i]:=AnsiChar(source[i+1]);
+  target[l]:=#0;
+end;
+
 end.

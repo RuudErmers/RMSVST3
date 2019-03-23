@@ -2,7 +2,6 @@
 library RMSMyVST2ForFP;
 
 uses
-  DAV_VstEffect,
   UMyVSTForm in '..\SimpleSynthCommon\UMyVSTForm.pas' {FormMyVST},
   UVSTInstrument in 'UVSTInstrument.pas',
   UMyVst in '..\SimpleSynthCommon\UMyVst.pas',
@@ -10,7 +9,8 @@ uses
   UCPluginFactory in 'UCPluginFactory.pas',
   UCDataLayer in '..\FrameworkCommon\UCDataLayer.pas',
   UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas',
-  UPianoKeyboard in '..\SimpleSynthCommon\UPianoKeyboard.pas';
+  UPianoKeyboard in '..\SimpleSynthCommon\UPianoKeyboard.pas',
+  DAVVstEffect in 'DAVVstEffect.pas';
 
 function VstPluginMain(AudioMasterCallback: TAudioMasterCallbackFunc): PVSTEffect; cdecl; export;
 begin

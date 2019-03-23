@@ -14,8 +14,8 @@ type TDataLayer = class(TStringList)
     function GetAttribute(attrib:string):string;
     function GetAttributeI(attrib:string;defValue:integer=0):integer;
     function GetAttributeB(attrib:string):boolean;
-    function LoadSection(SectionName:string;sl:Tstrings):boolean;
-    function SaveSection(SectionName:string;sl:Tstrings):boolean;
+    procedure LoadSection(SectionName:string;sl:Tstrings);
+    procedure SaveSection(SectionName:string;sl:Tstrings);
     constructor create(sl:TStringlist);overload;
 end;
 
@@ -46,7 +46,7 @@ begin
   data.Add('[~'+sectionname+']')
 end;
 
-function SlLoadSection(data:TStringList;sectionname: string;sl:Tstrings): boolean;
+procedure SlLoadSection(data:TStringList;sectionname: string;sl:Tstrings);
 Var i:integer;
     InSection:Boolean;
 begin
@@ -60,7 +60,7 @@ begin
   end;
 end;
 
-function SlSaveSection(data:TStringList;sectionname: string;sl:Tstrings): boolean;
+procedure SlSaveSection(data:TStringList;sectionname: string;sl:Tstrings);
 begin
   RemoveSection(data,sectionname);
   AddSection(data,sectionname,sl);
@@ -73,12 +73,12 @@ begin
 end;
 
 
-function TDataLayer.LoadSection(SectionName:string;sl:Tstrings):boolean;
+procedure TDataLayer.LoadSection(SectionName:string;sl:Tstrings);
 begin
   SlLoadSection(self,SectionName,sl);
 end;
 
-function TDataLayer.SaveSection(SectionName: string;  sl: Tstrings): boolean;
+procedure TDataLayer.SaveSection(SectionName: string;  sl: Tstrings);
 begin
   SlSaveSection(self,SectionName,sl);
 end;

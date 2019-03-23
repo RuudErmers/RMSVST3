@@ -71,6 +71,7 @@ end;
 
 function CPlugView.Attached(parent: pointer; aType: FIDString): TResult;
 begin
+  result:=kResultFalse;
   if parent=NIL then exit;
   CodeSite.Send('CPlugView.Attached');
   if FeditorForm = NIL then
@@ -118,6 +119,7 @@ begin
     size.right:=width;
     size.bottom:=height;
   end;
+  result:=kResultOk;
 end;
 
 function CPlugView.IsPlatformTypeSupported(aType: FIDString): TResult;
@@ -129,27 +131,28 @@ end;
 
 function CPlugView.OnFocus(state: TBool): TResult;
 begin
-
+  result:=kResultOk;
 end;
 
 function CPlugView.OnKeyDown(key: char16; keyCode, modifiers: int16): TResult;
 begin
-
+  result:=kResultOk;
 end;
 
 function CPlugView.OnKeyUp(key: char16; keyCode, modifiers: int16): TResult;
 begin
-
+  result:=kResultOk;
 end;
 
 function CPlugView.OnSize(newSize: PViewRect): TResult;
 begin
   CodeSite.Send('CPlugView.OnSize');
+  result:=kResultOk;
 end;
 
 function CPlugView.OnWheel(distance: single): TResult;
 begin
-
+  result:=kResultOk;
 end;
 
 function CPlugView.Removed: TResult;
@@ -159,6 +162,7 @@ begin
   FEditorForm.Parent:=NIL;
   FeditorForm.Free;
   FeditorForm:=NIL;
+  result:=kResultOk;
 end;
 
 function CPlugView.SetFrame(frame: IPlugFrame): TResult;
@@ -166,12 +170,5 @@ begin
   CodeSite.Send('CPlugView.SetFrame');
   result:=kResultOk;
 end;
-(*
-procedure CPlugView.SetParam(index:integer;value: double);
-begin
-  if FeditorForm<>NIL then
-    FeditorForm.DoChangeParameter(index,value);
-end;
-*)
 
 end.
