@@ -56,7 +56,7 @@ begin
   FSimpleSynth:=TSimpleSynth.Create(44100); // a simple synth...
   AddParameter(ID_CUTOFF,'Cutoff','Cutoff','Hz',20,20000,10000);
   AddParameter(ID_RESONANCE,'Resonance','Resonance','',0,1,0);
-  AddParameter(ID_PULSEWIDTH,'Pulse Width','PWM','%',0,100,0);
+  AddParameter(ID_PULSEWIDTH,'Pulse Width','PWM','%',0,100,50);
 end;
 
 procedure TMyVSTPlugin.OnMidiEvent(byte0, byte1, byte2: integer);
@@ -70,16 +70,18 @@ const MIDI_NOTE_ON = $90;
       MIDI_NOTE_OFF = $80;
       MIDI_CC = $B0;
 begin
-  // careful: OnMidiEvent can be called from NON-UI thread. Update UI on own risk
+  // careful:
+  // OnMidiEvent can be called from NON-UI thread. (in VST3)
+  // Update UI on own risk
+  // in this case we need to update the keyboard in the form
+  // note that for parameter based changed, you only have to update the processor
+  // we COULD make an extra method in the fw OnMidiEventEditor, but that should be discussed
+  // this is perhaps one of the reasons Steinberg chose to 'depricate' midi stuff
   status:=byte0 and $F0;
   if status=MIDI_NOTE_ON then KeyEvent(byte1,byte2>0)
   else if status=MIDI_NOTE_OFF then KeyEvent(byte1,false)
   else if (status=MIDI_CC) and (byte1=74) then
-  begin
-    UpdateEditorParameter(ID_CUTOFF,byte2/127);
-    UpdateProcessorParameter(ID_CUTOFF,byte2/127);
-  end;
-
+    UpdateHostParameter(ID_CUTOFF,byte2/127); // this also updates UI
 end;
 
 procedure TMyVSTPlugin.OnPresetChange(prgm: integer);

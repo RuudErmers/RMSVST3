@@ -8,7 +8,7 @@ uses
 
 
 type  TOnKeyEvent = procedure (Sender:TObject;key:integer;_on,infinite:boolean) of object;
-  TRMSKeyboard = class (TCustomPanel)
+  TRMCKeyboard = class (TGraphicControl)
     procedure Paint;override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState;
       X, Y: Integer); override;
@@ -21,12 +21,10 @@ type  TOnKeyEvent = procedure (Sender:TObject;key:integer;_on,infinite:boolean) 
     FLastKey:integer;
     Foctaves:integer;
     FSelected:array of boolean;
-    FNeedsRedraw,FDown:boolean;
-    FTimer:TTimer;
+    FDown:boolean;
     FOnKeyEvent:TOnKeyEvent;
     function LowerKey:integer;
 
-    procedure DrawKey(index:integer;selected:boolean);
     procedure SetOctaves(value:integer);
     function GetKey(X, Y: integer): integer;
     function GetBlackRect(octave,index: integer): TRect;
@@ -35,10 +33,8 @@ type  TOnKeyEvent = procedure (Sender:TObject;key:integer;_on,infinite:boolean) 
     procedure DrawWhiteKey(octave,index: integer;selected:integer);
 
     procedure SetKey(key: integer; _on: boolean;infinite:boolean=false);
-    procedure NeedsRedraw;
-    procedure RepaintChecker(Sender:TObject);
+    function xoffset(key: integer): integer;
   public
-    destructor Destroy;override;
     constructor Create(owner:TComponent); override;
     procedure SetKeyPressed(key:integer;_on:boolean);
   published
@@ -46,7 +42,6 @@ type  TOnKeyEvent = procedure (Sender:TObject;key:integer;_on,infinite:boolean) 
     property Octaves: integer read FOctaves write SetOctaves;
     property Anchors;
     property Align;
-    property Caption;
     property Enabled;
     property Visible;
   end;
@@ -60,36 +55,31 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('Piano Suite', [TRMSKeyboard]);
+  RegisterComponents('RMC', [TRMCKeyboard]); // Ruuds Midi Controls
 end;
 
 const blackkey:array[0..4] of integer = (1,3,6,8,10);
 const whitekey:array[0..7] of integer = (0,2,4,5,7,9,11,12);
 
-procedure TRMSKeyboard.NeedsRedraw;
-begin
-  FNeedsRedraw:=true;
-end;
-
-procedure TRMSKeyboard.SetKey(key:integer;_on:boolean;infinite:boolean);
+procedure TRMCKeyboard.SetKey(key:integer;_on:boolean;infinite:boolean);
 begin
   FSelected[key]:=_on;
   if assigned(OnKeyEvent) then
     OnKeyEvent(self,key+LowerKey,_on,infinite and _on);
-  NeedsRedraw;
+  Invalidate;
 end;
 
-procedure TRMSKeyboard.SetKeyPressed(key: integer; _on: boolean);
+procedure TRMCKeyboard.SetKeyPressed(key: integer; _on: boolean);
 begin
   dec(key,LowerKey);
   if (key>=0) and (key<=12*octaves) then
   begin
     FSelected[key]:=_on;
-    NeedsRedraw;
+    Invalidate;
   end;
 end;
 
-procedure TRMSKeyboard.MouseDown(Button: TMouseButton; Shift: TShiftState; X,  Y: Integer);
+procedure TRMCKeyboard.MouseDown(Button: TMouseButton; Shift: TShiftState; X,  Y: Integer);
 VAR key:integer;
 begin
   key:=GetKey(X,Y);
@@ -104,21 +94,20 @@ begin
 
 end;
 
-procedure TRMSKeyboard.MouseMove(Shift: TShiftState; X, Y: Integer);
+procedure TRMCKeyboard.MouseMove(Shift: TShiftState; X, Y: Integer);
 VAR key:integer;
 begin
   key:=GetKey(X,Y);
   if (key<>FLastKey) then
   begin
     if FDown then SetKey(FLastKey,false);
-    DrawKey(FLastKey,false);
     FLastKey:=key;
-    DrawKey(FLastKey,true);
     if FDown then SetKey(FLastKey,true);
+    Invalidate;
   end;
 end;
 
-procedure TRMSKeyboard.MouseUp(Button: TMouseButton; Shift: TShiftState; X,  Y: Integer);
+procedure TRMCKeyboard.MouseUp(Button: TMouseButton; Shift: TShiftState; X,  Y: Integer);
 begin
   if not FDown then exit;
   if FLastKey<>-1 then
@@ -128,12 +117,12 @@ begin
   end;
 end;
 
-procedure TRMSKeyboard.MyMouseEnter;
+procedure TRMCKeyboard.MyMouseEnter;
 begin
 
 end;
 
-procedure TRMSKeyboard.MyMouseLeave;
+procedure TRMCKeyboard.MyMouseLeave;
 begin
   MouseMove([],-100,-100);
 end;
@@ -144,7 +133,7 @@ begin
     result:=(x>=Left) and (x<Right) and (y>=Top) and (y<Bottom);
 end;
 
-function TRMSKeyboard.GetKey(X,Y:integer):integer;
+function TRMCKeyboard.GetKey(X,Y:integer):integer;
 VAR i,o:integer;
 begin
   for o:=0 to Octaves-1 do
@@ -165,67 +154,47 @@ begin
   else result:=-1;
 end;
 
-procedure TRMSKeyboard.DrawKey(index: integer; selected: boolean);
-begin
-  NeedsRedraw;
-end;
-
-function TRMSKeyboard.GetBlackRect(octave,index:integer):TRect;
+function TRMCKeyboard.GetBlackRect(octave,index:integer):TRect;
   const off: array[0..4] of integer = ( 17,49,95,126,156);
   function pixw(w,f1,f2:integer):integer; begin result:=round(w*f2/f1); end;
-VAR w,x,octoffset:integer;
+VAR w,x,scalew:integer;
 begin
-  octoffset:= 7*(width DIV (7*octaves+1)) ;
-  w:= pixw(17,186,octoffset) ;
-  x:= pixw(off[index],186,octoffset)+octoffset*octave ;
+  scalew:= xoffset(7);
+  x:= pixw(off[index],186,scalew)+xoffset(7*octave);
+  w:= pixw(17,186,scalew);
   result:=Rect(x,0,x+w,round(height*0.63));
 end;
 
-function TRMSKeyboard.GetWhiteRect(octave,index:integer):TRect;
-VAR w,x,octoffset:integer;
+function TRMCKeyboard.xoffset(key:integer):integer;
 begin
-  octoffset:= 7*(width DIV (7*octaves+1)) ;
-  w:=width DIV (7*octaves+1);
-  x:=octoffset*octave;
-  result:=Rect(x+w*index,0,x+w*(index+1),height);
+  result:=round(width*key/(7*octaves+1));
 end;
 
-function TRMSKeyboard.LowerKey: integer;
+function TRMCKeyboard.GetWhiteRect(octave,index:integer):TRect;
+VAR x,w:integer;
+begin
+  x:=xoffset(7*octave)+xoffset(index);
+  w:=xoffset(index+1)-xoffset(index);
+  result:=Rect(x,0,x+w,height);
+end;
+
+function TRMCKeyboard.LowerKey: integer;
 begin
   result:=12*(5-Octaves DIV 2);
 end;
 
-constructor TRMSKeyboard.Create(owner: TComponent);
+constructor TRMCKeyboard.Create(owner: TComponent);
 begin
   inherited;
-  FTimer:=TTimer.Create(self);
-  FTimer.Interval:=100;
-  FTimer.OnTimer:=RepaintChecker;
-  FTimer.Enabled:=true;
   OnMouseEnter:=MyMouseEnter;
   OnMouseLeave:=MyMouseLeave;
   Octaves:=3;
-  BevelOuter:=bvNone;
-  DoubleBuffered:=true;
+  Width:=600;
+  Height:=90;
   FLastKey:=-1;
 end;
 
-destructor TRMSKeyboard.Destroy;
-begin
-  FTimer.Free;
-  inherited;
-end;
-
-procedure TRMSKeyboard.RepaintChecker(Sender:TObject);
-begin
-  if FNeedsRedraw then
-  begin
-    FNeedsRedraw:=false;
-    Invalidate;
-  end;
-end;
-
-procedure TRMSKeyboard.DrawBlackKey(octave,index:integer;selected:integer);
+procedure TRMCKeyboard.DrawBlackKey(octave,index:integer;selected:integer);
 begin
   Canvas.Pen.Color:=clBlack;
   Canvas.Pen.Style:=psSolid;
@@ -240,7 +209,7 @@ begin
     Canvas.Rectangle(Left,Top,Right,Bottom);
 end;
 
-procedure TRMSKeyboard.DrawWhiteKey(octave,index:integer;selected:integer);
+procedure TRMCKeyboard.DrawWhiteKey(octave,index:integer;selected:integer);
 begin
   begin
     Canvas.Pen.Color:=clBlack;
@@ -257,16 +226,15 @@ begin
   end;
 end;
 
-procedure TRMSKeyboard.Paint;
-VAR i,o:integer;
+procedure TRMCKeyboard.Paint;
   function getSelect(key:integer):integer;
   begin
     if Fselected[key] then result:=1
     else if key=FLastKey then result:=2
     else result:=0;
   end;
+VAR i,o:integer;
 begin
-  inherited;
   for o:=0 to Octaves-1 do
   begin
     for i:=0 to 6 do DrawWhiteKey(o,i,getSelect(o*12+whitekey[i]));
@@ -275,15 +243,13 @@ begin
   end;
 end;
 
-procedure TRMSKeyboard.SetOctaves(value: integer);
+procedure TRMCKeyboard.SetOctaves(value: integer);
 VAR i:integer;
 begin
   Foctaves:=value;
   setLength(FSelected,12*FOctaves+1);
   for i:=0 to 12*FOctaves do FSelected[i]:=false;
-  NeedsRedraw;
+  Invalidate;
 end;
-
-
 
 end.

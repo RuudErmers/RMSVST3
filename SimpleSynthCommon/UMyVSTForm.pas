@@ -21,7 +21,7 @@ type
   private
     { Private declarations }
     FScrollBars:array[0..2] of TScrollBar;
-    Fkeyboard:TRMSKeyboard;
+    Fkeyboard:TRMCKeyboard;
     procedure CBOnKeyEvent(Sender: TObject; key: integer; _on,
       infinite: boolean);
   public
@@ -42,7 +42,7 @@ implementation
 
 procedure TFormMyVST.FormCreate(Sender: TObject);
 begin
-  Fkeyboard:=TRMSKeyboard.Create(self);
+  Fkeyboard:=TRMCKeyboard.Create(self);
   Fkeyboard.Parent:=self;
   Fkeyboard.Align:=alBottom;
   Fkeyboard.Height:=80;
