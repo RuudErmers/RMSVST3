@@ -41,7 +41,7 @@ implementation
 
 { CComponent }
 
-uses CodeSiteLogging;
+uses CodeSiteLogging,UVST3Utils;
 
 function CComponent.ActivateBus(vType: TMediaType; dir: TBusDirection;  index: int32; state: TBool): TResult;
 begin
@@ -90,7 +90,7 @@ function CComponent.GetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CComponent.GetState');
 // In reaper,and with a combined Component, EditController it is not needed to Getstate/SetState
-  IVST3.GetProcessorState(state);
+  WriteStream(state,STREAMMAGIC_PROCESSOR,IVST3.GetProcessorState);
   result:=kResultOk;
 end;
 
@@ -121,7 +121,7 @@ function CComponent.SetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CComponent.SetState');
 // In reaper,and with a combined Component, EditController is not needed to Getstate/SetState
-  IVST3.SetProcessorState(state);
+  IVST3.SetProcessorState(ReadStream(state,STREAMMAGIC_PROCESSOR));
   result:=kResultTrue;
 end;
 

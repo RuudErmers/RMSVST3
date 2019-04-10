@@ -105,7 +105,7 @@
         </DelphiCompile>
         <DCCReference Include="UCPluginFactory.pas"/>
         <DCCReference Include="Vst3Base.pas"/>
-        <DCCReference Include="UUIDHelper.pas"/>
+        <DCCReference Include="UVST3Utils.pas"/>
         <DCCReference Include="UCEditController.pas"/>
         <DCCReference Include="UCAudioProcessor.pas"/>
         <DCCReference Include="UCComponent.pas"/>

@@ -82,7 +82,7 @@ type
       procedure UpdateProcessorParameter(id:integer;value:double);virtual;
       procedure OnInitialize;virtual;
       procedure UpdateEditorParameter(id:integer;value:double);virtual;
-      procedure OnPresetChange(prgm:integer);virtual;
+      procedure OnProgramChange(prgm:integer);virtual;
       function  EditorForm: TForm;
       function getParameterAsString(id: integer; value: double): string; virtual;
       procedure OnSysexEvent(s:string);virtual;
@@ -447,7 +447,7 @@ begin
 
 end;
 
-procedure TVSTInstrument.OnPresetChange(prgm: integer);
+procedure TVSTInstrument.OnProgramChange(prgm: integer);
 begin
 
 end;

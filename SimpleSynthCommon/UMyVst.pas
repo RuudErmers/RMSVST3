@@ -18,7 +18,7 @@ protected
   procedure OnInitialize;override;
   procedure UpdateEditorParameter(id:integer;value:double);override;
   procedure OnEditOpen;override;
-  procedure OnPresetChange(prgm:integer);override;
+  procedure OnProgramChange(prgm:integer);override;
   procedure OnMidiEvent(byte0, byte1, byte2: integer);override;
   procedure onKeyEvent(key: integer; _on: boolean);
 public
@@ -84,10 +84,10 @@ begin
     UpdateHostParameter(ID_CUTOFF,byte2/127); // this also updates UI
 end;
 
-procedure TMyVSTPlugin.OnPresetChange(prgm: integer);
+procedure TMyVSTPlugin.OnProgramChange(prgm: integer);
 begin
   if EditorForm<>NIL then
-    TFormMyVST(EditorForm).SetPreset(prgm);
+    TFormMyVST(EditorForm).SetProgram(prgm);
 end;
 
 procedure TMyVSTPlugin.OnEditOpen;

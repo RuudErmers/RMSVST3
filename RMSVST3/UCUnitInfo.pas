@@ -51,7 +51,7 @@ implementation
 
 { CUnitInfo }
 
-uses CodeSiteLogging;
+uses CodeSiteLogging, UVST3Utils;
 
 constructor CUnitInfo.Create(const Controller: IVST3Controller);
 begin
@@ -74,9 +74,9 @@ function CUnitInfo.GetProgramListInfo(listIndex: int32;  out info: TProgramListI
 begin
   if listIndex=0 then
   begin
-    info.id := IDPARMPRESET;
+    info.id := IDPARMPROGRAM;
     info.programCount := IVST3.GetNumPrograms;
-    AssignString(info.name, 'Factory Presets');
+    AssignString(info.name, 'Factory Programs');
     result:=kResultTrue;
   end
   else

@@ -1,44 +1,59 @@
 //-----------------------------------------------------------------------------
 // Project     : SDK Core
-// Version     : 3.5.2
+// Version     : 3.6.13
 //
 // Category    : SDK Core Interfaces
-// Created by  : Steinberg, 08/2012
+// Created by  : Steinberg, 
 // Description : Basic Interface
 //
 //-----------------------------------------------------------------------------
-// LICENSE
-// © 2012, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
-// This Software Development Kit may not be distributed in parts or its entirety
-// without prior written agreement by Steinberg Media Technologies GmbH.
-// This SDK must not be used to re-engineer or manipulate any technology used
-// in any Steinberg or Third-party application or software module,
-// unless permitted by law.
-// Neither the name of the Steinberg Media Technologies nor the names of its
-// contributors may be used to endorse or promote products derived from this
-// software without specific prior written permission.
-//
-// THIS SDK IS PROVIDED BY STEINBERG MEDIA TECHNOLOGIES GMBH "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//
-// IN NO EVENT SHALL STEINBERG MEDIA TECHNOLOGIES GMBH BE LIABLE FOR ANY DIRECT,
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-// OF THE POSSIBILITY OF SUCH DAMAGE.
-//------------------------------------------------------------------------------
-//
-//  Translation to Delphi
-//  Version         :  1.2.0
-//  VST sdk version :  3.5.2
-//  Date            :  2013/09/20
+// LICENSE
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
+(*-----------------------------------------------------------------------------
+This license applies only to files referencing this license,
+for other files of the Software Development Kit the respective embedded license text
+is applicable. The license can be found at: www.steinberg.net/sdklicenses_vst3
+
+This Software Development Kit is licensed under the terms of the Steinberg VST3 License,
+or alternatively under the terms of the General Public License (GPL) Version 3.
+You may use the Software Development Kit according to either of these licenses as it is
+most appropriate for your project on a case-by-case basis (commercial or not).
+
+a) Proprietary Steinberg VST3 License
+The Software Development Kit may not be distributed in parts or its entirety
+without prior written agreement by Steinberg Media Technologies GmbH.
+The SDK must not be used to re-engineer or manipulate any technology used
+in any Steinberg or Third-party application or software module,
+unless permitted by law.
+Neither the name of the Steinberg Media Technologies GmbH nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+Before publishing a software under the proprietary license, you need to obtain a copy
+of the License Agreement signed by Steinberg Media Technologies GmbH.
+The Steinberg VST SDK License Agreement can be found at:
+www.steinberg.net/en/company/developers.html
+
+THE SDK IS PROVIDED BY STEINBERG MEDIA TECHNOLOGIES GMBH "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL STEINBERG MEDIA TECHNOLOGIES GMBH BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+
+b) General Public License (GPL) Version 3
+Details of these licenses can be found at: www.gnu.org/licenses/gpl-3.0.html *)
+//----------------------------------------------------------------------------------//
+//  Translation to Delphi of this unit
+
 //  Author          :  Frederic Vanmol
 //  Web             :  www.axiworld.be
 //  E-mail          :  info@axiworld.be
+//  Edited by Ruud Ermers
 //
 //  Translated files
 //  - ftypes.h
@@ -1291,7 +1306,7 @@ type
       // Returns count of Parameter changes in the list.
       function GetParameterCount: int32; stdcall;
       // Returns the queue at a given index.
-      function GetParameterData(index: int32): pointer{IParamValueQueue}; stdcall;     // NB: Try to change this to IParamValueQueue -> Nop, does not work..
+      function GetParameterData(index: int32): pointer{IParamValueQueue}; stdcall;     // RE: Tried to change this to IParamValueQueue -> Nop, does not work..
       (* Adds a new parameter queue with a given ID at the end of the list,
       returns it and its index in the parameter changes list. *)
       function AddParameterData(var id: TParamID; out index: int32): pointer{IParamValueQueue}; stdcall;
@@ -3216,30 +3231,7 @@ const
 const
      kAttributesFlagsHideableFlag = 'hideable';  // the associated layer marked as hideable allows a remote to hide or make it not usable a parameter when the associated value is inactive
 
-procedure AssignString(VAR target: array of AnsiChar; source:string);overload;
-procedure AssignString(VAR target: array of TChar; source:string);overload;
-
 implementation
 
-
-procedure AssignString(VAR target: array of TChar; source:string);
-VAR i,l:integer;
-begin
-  l:=length(source);
-  if l>=high(target) then l:=high(target)-1;
-  for i:=0 to l-1 do
-    target[i]:=source[i+1];
-  target[l]:=#0;
-end;
-
-procedure AssignString(VAR target: array of AnsiChar; source:string);
-VAR i,l:integer;
-begin
-  l:=length(source);
-  if l>=high(target) then l:=high(target)-1;
-  for i:=0 to l-1 do
-    target[i]:=AnsiChar(source[i+1]);
-  target[l]:=#0;
-end;
-
-end.
+end.
+

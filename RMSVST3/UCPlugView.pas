@@ -50,24 +50,9 @@ public
 
 implementation
 
-uses CodeSiteLogging,UUIDHelper,SysUtils, Windows;
+uses CodeSiteLogging,UVST3Utils,SysUtils, Windows;
 
 { CPlugView }
-
-(*
-procedure CPlugView.ResendParameters;
-VAR i,count:integer;
-    value:double;
-begin
-  if FeditorForm=NIL then exit;
-  count:=IVST3.GetParameterCount;
-  for i:=0 to count-1 do
-  begin
-    value:=IVST3.GetParameterValue(i);
-    FeditorForm.DoChangeParameter(i,value);
-  end;
-end;
-*)
 
 function CPlugView.Attached(parent: pointer; aType: FIDString): TResult;
 begin

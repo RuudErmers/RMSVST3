@@ -60,7 +60,7 @@ implementation
 
 { CEditController }
 
-uses CodeSiteLogging,SysUtils;
+uses CodeSiteLogging,SysUtils,UVST3Utils;
 
 constructor CEditController.Create(const Controller: IVST3Controller);
 begin
@@ -104,7 +104,14 @@ end;
 function CEditController.GetState(state: IBStream): TResult;
 begin
   CodeSite.Send('CEditController.GetState');
-  IVST3.GetEditorState(state);
+  WriteStream(state,STREAMMAGIC_CONTROLLER,IVST3.GetEditorState);
+  result:=kResultOk;
+end;
+
+function CEditController.SetState(state: IBStream): TResult;
+begin
+  CodeSite.Send('CEditController.SetState');
+  IVST3.SetEditorState(ReadStream(state,STREAMMAGIC_CONTROLLER));
   result:=kResultOk;
 end;
 
@@ -137,7 +144,7 @@ end;
 function CEditController.SetComponentState(state: IBStream): TResult;
 begin
   CodeSite.Send('CEditController.SetComponentState');
-  IVST3.SetProcessorState(state);
+  IVST3.ControllerSetProcessorState(ReadStream(state,STREAMMAGIC_PROCESSOR));
   result:=kResultOk;
 end;
 
@@ -146,13 +153,6 @@ function CEditController.SetParamNormalized(tag: TParamID;  value: TParamValue):
 begin
   CodeSite.Send('CEditController.SetParamNormalized');
   IVST3.ControllerParameterSetValue(tag,value);
-  result:=kResultOk;
-end;
-
-function CEditController.SetState(state: IBStream): TResult;
-begin
-  CodeSite.Send('CEditController.SetState');
-  IVST3.SetEditorState(state);
   result:=kResultOk;
 end;
 

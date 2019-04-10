@@ -2,7 +2,7 @@ unit UVST3Processor;
 
 interface
 
-uses UVSTBase, Vst3Base, Generics.Collections;
+uses UVSTBase, Vst3Base, UVst3Utils,Generics.Collections;
 
 type
      IVST3Processor = interface(IVSTBase)
@@ -13,8 +13,8 @@ type
         procedure SamplerateChanged(samplerate:single);
         procedure TempoChanged(tempo:single);
         procedure PlayStateChanged(playing:boolean;ppq:integer);
-        procedure GetProcessorState(stream:IBStream);
-        procedure SetProcessorState(stream:IBStream);
+        function GetProcessorState:string;
+        procedure SetProcessorState(state:string);
         procedure SetActive(active:boolean);
         procedure ProcessorInitialize;
         procedure ProcessorTerminate;
@@ -22,13 +22,13 @@ type
      TVST3Processor = class(TVSTBase,IVST3Processor)
       private
         Factive:boolean;
-        procedure GetProcessorState(stream:IBStream);
-        procedure SetProcessorState(stream:IBStream);
+        function GetProcessorState:string;
+        procedure SetProcessorState(state:string);
         procedure SetActive(active:boolean);
       protected
-        procedure ProcessorInitialize;virtual;
-        procedure ProcessorTerminate;virtual;
-        procedure ProcessorParameterSetValue(id:integer;value:double);virtual;
+        procedure ProcessorInitialize;virtual; // will be overridden in Controller
+        procedure ProcessorTerminate;virtual;  // will be overridden in Controller
+        procedure ProcessorParameterSetValue(id:integer;value:double);virtual; // will be overridden in Controller
         procedure OnSysexEvent(s:string);virtual;
         procedure OnMidiEvent(byte0,byte1,byte2:integer);virtual;
         procedure Process32(samples,channels:integer;inputp, outputp: PPSingle);virtual;
@@ -89,12 +89,12 @@ begin
 // virtual
 end;
 
-procedure TVST3Processor.GetProcessorState(stream: IBStream);
+function TVST3Processor.GetProcessorState:string;
 begin
 // Not implemented, no need for
 end;
 
-procedure TVST3Processor.SetProcessorState(stream: IBStream);
+procedure TVST3Processor.SetProcessorState(state:string);
 begin
 // Not implemented, no need for
 end;

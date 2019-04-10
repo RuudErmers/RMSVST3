@@ -6,7 +6,7 @@ library RMSMyVST3ForFP;
 uses
   UCPluginFactory in 'UCPluginFactory.pas',
   Vst3Base in 'Vst3Base.pas',
-  UUIDHelper in 'UUIDHelper.pas',
+  UVST3Utils in 'UVST3Utils.pas',
   UCEditController in 'UCEditController.pas',
   UCAudioProcessor in 'UCAudioProcessor.pas',
   UCComponent in 'UCComponent.pas',

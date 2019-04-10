@@ -4,8 +4,8 @@ interface
 
 uses Forms,UVST3Processor,Vst3Base,UVSTBase,UCDataLayer,Generics.Collections,ExtCtrls;
 
-const PROGRAMCOUNT = 32;
-const IDPARMPRESET = 4788;
+const PROGRAMCOUNT = 16;
+const IDPARMProgram = 4788;
 
 // I REFUSE to use the word Component, because
 // 1. This is a 'reserved' word in many applications
@@ -16,7 +16,7 @@ type TVST3Parameter  = record
                         id,steps:integer;
                         title,shorttitle,units:string;
                         min,max,defVal,value:double;
-                        automate,isPreset,dirty:boolean;
+                        automate,isProgram,dirty:boolean;
                       end;
      TVST3ParameterArray = TArray<TVST3Parameter>;
      TVST3Program = class
@@ -41,9 +41,9 @@ type TVST3Parameter  = record
         function GetParameterInfo(paramIndex: integer;VAR info: TParameterInfo):boolean;
         function getParameterValue(id:integer):double;
         function GetParamStringByValue(id: integer; valueNormalized: double): string;
-        procedure GetEditorState(stream:IBStream);
-        procedure SetEditorState(stream:IBStream);
-        procedure SetProcessorState(stream:IBStream);
+        function GetEditorState:string;
+        procedure SetEditorState(state:string);
+        procedure ControllerSetProcessorState(state:string);
         procedure ControllerInitialize;
         function NormalizedParamToPlain(id:integer;  valueNormalized: double): double;
         function PlainParamToNormalized(id:integer; plainValue: double): double;
@@ -56,7 +56,7 @@ type TVST3Parameter  = record
      end;
    TVST3Controller = class(TVST3Processor,IVST3Controller,IVST3Processor)
    private
-        FCurPreset:integer;
+        FCurProgram:integer;
         FPrograms: TList<TVST3Program>;
         Fparameters:TVST3ParameterArray;
         FeditorForm:TForm;
@@ -66,7 +66,7 @@ type TVST3Parameter  = record
         FIdleTimer:TTimer;
         FSomethingDirty:boolean;
         procedure saveCurrentToProgram(prgm:integer);
-        procedure SetPreset(prgm:integer;saveCurrent:boolean;updateProcessor:boolean);
+        procedure SetProgram(prgm:integer;saveCurrent:boolean;updateProcessor:boolean);
         function ParmLookup(id: integer): integer;
         function CreateForm(parent:pointer):Tform;
         procedure EditOpen(form:TForm);
@@ -75,9 +75,9 @@ type TVST3Parameter  = record
         function GetParameterInfo(paramIndex: integer;VAR info: TParameterInfo):boolean;
         function GetParamStringByValue(id: integer; valueNormalized: double): string;
 
-        procedure GetEditorState(stream:IBStream);
-        procedure SetEditorState(stream:IBStream);
-        procedure SetProcessorState(stream:IBStream);
+        function GetEditorState:string;
+        procedure SetEditorState(state:string);
+        procedure ControllerSetProcessorState(state:string);
         procedure Initialize;
         procedure Terminate;
         procedure ControllerInitialize;
@@ -99,12 +99,12 @@ type TVST3Parameter  = record
         procedure ProcessorInitialize;override;final;
         procedure ProcessorTerminate;override;final;
         procedure ProcessorParameterSetValue(id:integer;value:double);override;final;
-        procedure AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;presetChange:boolean=false);
+        procedure AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;ProgramChange:boolean=false);
         procedure ResendParameters;
         procedure UpdateHostParameter(id:integer;value:double);
         property  EditorForm: TForm read FEditorForm;
         function getParameterAsString(id: integer; value: double): string; virtual;
-        procedure OnPresetChange(prgm:integer);virtual;
+        procedure OnProgramChange(prgm:integer);virtual;
         function  GetEditorClass: TFormClass;virtual;
         procedure OnEditOpen;virtual;
         procedure OnEditClose;virtual;
@@ -118,7 +118,7 @@ type TVST3Parameter  = record
 
 implementation
 
-uses SysUtils,CodeSiteLogging,Windows,Math;
+uses SysUtils,CodeSiteLogging,Windows,Math, UVst3Utils;
 
 constructor TVST3Controller.Create;
 begin
@@ -129,37 +129,17 @@ end;
 
 function TVST3Controller.GetProgramName(index: integer): string;
 begin
-  result:='Preset '+format('%.2d',[index+1]);
+  result:='Program '+format('%.2d',[index+1]);
 end;
 
-const STATE_MAGIC = 346523;
-const MAGIC_DL =42977;
-procedure TVST3Controller.GetEditorState(stream: IBStream);
+function TVST3Controller.GetEditorState:string;
 VAR i,n:integer;
     sl,ssl:TDataLayer;
-
-  procedure SaveToIBStream(s:string);
-  VAR i,l:integer;
-      buffer:TBytes;
-  begin
-    l:=MAGIC_DL;
-    stream.write(@l,sizeof(integer));
-    l:=Length(s);
-    stream.write(@l,sizeof(integer));
-    SetLength(buffer,l);
-    for i:=0 to l-1 do
-      buffer[i]:=ord(s[i+1]);
-    Stream.Write(Buffer, Length(Buffer));
-  end;
-
-
 begin
-  saveCurrentToProgram(FCurPreset);
-  CodeSite.Send('Get State Called with Preset='+ FCurPreset.ToString);
-  n:=STATE_MAGIC;
-  stream.Write(@n,sizeof(integer));
+  saveCurrentToProgram(FCurProgram);
+  CodeSite.Send('Get State Called with Program='+ FCurProgram.ToString);
   sl:=TDataLayer.Create;
-  sl.setAttributeI('CurPreset',FCurPreset);
+  sl.setAttributeI('CurProgram',FCurProgram);
   ssl:=TDataLayer.Create;
   for i:=0 to PROGRAMCOUNT-1 do
   begin
@@ -168,56 +148,28 @@ begin
     sl.SaveSection('Program'+i.ToString,ssl);
   end;
   ssl.Free;
-  SaveToIBStream(sl.Text);
+  result:=sl.Text;
   sl.Free;
 end;
 
 
-procedure TVST3Controller.SetEditorState(stream: IBStream);
-VAR i,n,TempPreset:integer;
+procedure TVST3Controller.SetEditorState(state:string);
+VAR i,TempProgram:integer;
     sl,ssl:TDataLayer;
-
-    function LoadFromIBStream:string;
-    VAR i,l:integer;
-      buffer:TBytes;
-    begin
-      result:='';
-      stream.read(@l,sizeof(integer));
-      if l<>MAGIC_DL then
-      begin
-        CodeSite.Send('CDataLayer Error...');
-        exit;
-      end;
-      stream.read(@l,sizeof(integer));
-      SetLength(buffer,l);
-      stream.read(buffer,l);
-      for i:=0 to l-1 do
-        result:=result+chr(buffer[i]);
-    end;
-
-
 begin
+  CodeSite.Send('Set State: LOADING...');
+  sl:=TDataLayer.Create;
+  sl.Text:=state;
+  TempProgram:=sl.getAttributeI('CurProgram');
+  ssl:=TDataLayer.Create;
+  for i:=0 to PROGRAMCOUNT-1 do
   begin
-    stream.read(@n,sizeof(integer));
-    if n<>STATE_MAGIC then
-    begin
-        CodeSite.Send('Set State Error: ');
-      exit;
-    end;
-    CodeSite.Send('Set State: LOADING...');
-    sl:=TDataLayer.Create;
-    sl.Text:=LoadFromIBStream;
-    TempPreset:=sl.getAttributeI('CurPreset');
-    ssl:=TDataLayer.Create;
-    for i:=0 to PROGRAMCOUNT-1 do
-    begin
-      sl.LoadSection('Program'+i.ToString,ssl);
-      FPrograms[i].SetState(FParameters,FnumUserParameters,ssl);
-    end;
-    ssl.free;
-    sl.free;
+    sl.LoadSection('Program'+i.ToString,ssl);
+    FPrograms[i].SetState(FParameters,FnumUserParameters,ssl);
   end;
-  SetPreset(TempPreset,false,true);
+  ssl.free;
+  sl.free;
+  SetProgram(TempProgram,false,true);
 end;
 
 procedure TVST3Controller.saveCurrentToProgram(prgm:integer);
@@ -241,7 +193,7 @@ begin
   FProcessorHandler:=handler;
 end;
 
-procedure TVST3Controller.SetProcessorState(stream: IBStream);
+procedure TVST3Controller.ControllerSetProcessorState(state:string);
 begin
 // nothing to do...
 end;
@@ -268,13 +220,13 @@ begin
     saveCurrentToProgram(i);
   //////////////////////////////////////////
   CodeSite.Send('INIT: NumParams = '+FnumUserParameters.ToString);
-  AddParameter(IDPARMPRESET, 'Preset','Preset','',0,31,0,false,31,true);
+  AddParameter(IDPARMProgram, 'Program','Program','',0,PROGRAMCOUNT-1,0,false,PROGRAMCOUNT-1,true);
   for i:=0 to 127 do
   begin
     title:='CCSIM_'+i.ToString;
     AddParameter(MIDICC_SIMULATION_START+i,title,title,'CC',0,127,0.3,false);
   end;
-  SetPreset(0,false,true);
+  SetProgram(0,false,true);
 end;
 
 function TVST3Controller.GetMidiCCParamID(channel,midiControllerNumber: integer): integer;
@@ -284,7 +236,7 @@ end;
 
 function TVST3Controller.GetNumPrograms: integer;
 begin
-  result:=16;
+  result:=PROGRAMCOUNT;
 end;
 
 function TVST3Controller.getParameterAsString(id: integer;  value: double): string;
@@ -302,13 +254,13 @@ begin
   Terminate;
 end;
 
-procedure TVST3Controller.SetPreset(prgm:integer;saveCurrent:boolean;updateProcessor:boolean);
+procedure TVST3Controller.SetProgram(prgm:integer;saveCurrent:boolean;updateProcessor:boolean);
 begin
   if saveCurrent then
-   saveCurrentToProgram(FCurPreset);
-  FCurPreset:=prgm;
+   saveCurrentToProgram(FCurProgram);
+  FCurProgram:=prgm;
   UpdateCurrentFromProgram(prgm,updateProcessor);
-  OnPresetChange(prgm);
+  OnProgramChange(prgm);
 end;
 
 function TVST3Controller.GetParameterCount: integer;
@@ -345,7 +297,7 @@ begin
   info.defaultNormalizedValue:=Fparameters[paramIndex].defVal;
   info.unitId:= kRootUnitId;
   info.flags:= ifthen(Fparameters[paramIndex].automate,kCanAutomate,0)
-                + ifthen(Fparameters[paramIndex].ispreset,kIsProgramChange,0);
+                + ifthen(Fparameters[paramIndex].isProgram,kIsProgramChange,0);
   result:=true;
 end;
 
@@ -435,7 +387,7 @@ begin
   begin
     id:=Fparameters[i].id;
     if isMidiCCId(id) then continue;  // better safe than sorry
-    if id = IDPARMPRESET then continue;  // better safe than sorry
+    if id = IDPARMProgram then continue;  // better safe than sorry
     UpdateEditorParameter(id,Fparameters[i].value);
     Fparameters[i].dirty:=false
   end;
@@ -533,7 +485,7 @@ begin
 
 end;
 
-procedure TVST3Controller.OnPresetChange(prgm: integer);
+procedure TVST3Controller.OnProgramChange(prgm: integer);
 begin
 // virtual
 end;
@@ -554,10 +506,10 @@ begin
   index:=ParmLookup(id);
   if index=-1 then exit;
   if (value<0) or (value>1) then exit;
-  if id = IDPARMPRESET then
+  if id = IDPARMProgram then
   begin
     CodeSite.Send('Program Change');
-    SetPreset(round(value*31),true,true);
+    SetProgram(round(value*(PROGRAMCOUNT-1)),true,true);
   end
   else
     InternalSetParameter(index,value,false);
@@ -577,13 +529,13 @@ begin
   begin // do some validation on the input..
     index:=ParmLookup(id);
     if index=-1 then exit;
-    if id<> IDPARMPRESET then
+    if id<> IDPARMProgram then
       UpdateProcessorParameter(id,value);
     end;
 end;
 
 
-procedure TVST3Controller.AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;presetChange:boolean=false);
+procedure TVST3Controller.AddParameter(id:integer;title,shorttitle,units:string;min,max,val:double;automate:boolean=true;steps:integer=0;ProgramChange:boolean=false);
 
 VAR n:integer;
     params:TVST3Parameter;
@@ -602,7 +554,7 @@ begin
   params.value:=val;
   params.automate:=automate;
   params.steps:=steps;
-  params.isPreset:=presetChange;
+  params.isProgram:=ProgramChange;
   n:=Length(Fparameters);
   SetLength(Fparameters,n+1);
   FParameters[n]:=params;
@@ -655,7 +607,5 @@ begin
 end;
 
 
-
-
-
 end.
+

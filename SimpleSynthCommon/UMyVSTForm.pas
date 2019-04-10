@@ -29,7 +29,7 @@ type
     { property } OnKeyEvent: TonMyKeyEvent;
     { property } UpdateHostParameter:TOnParameterChanged;
     procedure UpdateEditorParameter(index:integer;value: double);
-    procedure SetPreset(prgm:integer);
+    procedure SetProgram(prgm:integer);
     procedure SetKey(key:integer;_on:boolean);
   end;
 
@@ -72,9 +72,9 @@ begin
   Fkeyboard.SetKeyPressed(key,_on);
 end;
 
-procedure TFormMyVST.SetPreset(prgm: integer);
+procedure TFormMyVST.SetProgram(prgm: integer);
 begin
-  Label2.Caption:='Preset:'+prgm.toString;
+  Label2.Caption:='Program:'+prgm.toString;
 end;
 
 procedure TFormMyVST.UpdateEditorParameter(index:integer;value: double);

@@ -26,7 +26,7 @@ implementation
 
 { CPluginFactory }
 
-uses CodeSiteLogging,SysUtils,UCEditController,UUIDHelper ;
+uses CodeSiteLogging,SysUtils,UCEditController,UVST3Utils ;
 
 const CLTYPE_CONTROLLER = 28;
 const CLTYPE_PROCESSOR = 27;
