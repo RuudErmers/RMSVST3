@@ -1,7 +1,7 @@
 This is a Delphi translation of the VST3 Protocol.
-In fact, it is also an implementation for VST2 and Fruityplug!
+In fact, it is also an implementation for Fruityplug.
 It supports many of the VST3 aspects, but not all.
-The main class is TVSTInstrument which implements the functionality of a VST2/VST3/Fruityplug Plugin.
+The main class is TVSTInstrument which implements the functionality of a VST3/Fruityplug Plugin.
 It is a combined Processor/Controller and implements the following:
 - Audio processing (synth or effect), two channel only. 
 - Midi CC processing
