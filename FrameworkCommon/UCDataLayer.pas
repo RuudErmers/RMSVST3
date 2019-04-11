@@ -21,7 +21,7 @@ end;
 
 implementation
 
-uses SysUtils,CodeSiteLogging;
+uses SysUtils,UCodeSiteLogger;
 
 procedure RemoveSection(data:TStringList;sectionname:string);
 VAR i, istart,istop:integer;

@@ -123,6 +123,7 @@
         </DCCReference>
         <DCCReference Include="..\SimpleSynthCommon\UPianoKeyboard.pas"/>
         <DCCReference Include="..\SimpleSynthCommon\UMyVstDSP.pas"/>
+        <DCCReference Include="..\FrameworkCommon\UCodeSiteLogger.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -203,7 +204,7 @@
                 <Platform value="Win64">True</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="C:\Midi\Vst\RMSMyVST3ForFP.dll" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Program Files\Common Files\VST3\RMSMyVST3ForFP.dll" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>RMSMyVST3ForFP.dll</RemoteName>
                         <Overwrite>true</Overwrite>

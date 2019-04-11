@@ -21,7 +21,8 @@ uses
   UMyVst in '..\SimpleSynthCommon\UMyVst.pas',
   UMyVSTForm in '..\SimpleSynthCommon\UMyVSTForm.pas' {FormMyVST},
   UPianoKeyboard in '..\SimpleSynthCommon\UPianoKeyboard.pas',
-  UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas';
+  UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas',
+  UCodeSiteLogger in '..\FrameworkCommon\UCodeSiteLogger.pas';
 
 function InitDLL:boolean; cdecl; export;
 begin

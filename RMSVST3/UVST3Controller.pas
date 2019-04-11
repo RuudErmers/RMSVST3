@@ -118,11 +118,11 @@ type TVST3Parameter  = record
 
 implementation
 
-uses SysUtils,CodeSiteLogging,Windows,Math, UVst3Utils;
+uses SysUtils,UCodeSiteLogger,Windows,Math, UVst3Utils;
 
 constructor TVST3Controller.Create;
 begin
-  CodeSite.Send('TVST3Controller.Create');
+  WriteLog('TVST3Controller.Create');
   inherited;
   FPrograms:=TList<TVST3Program>.Create;
 end;
@@ -137,7 +137,7 @@ VAR i,n:integer;
     sl,ssl:TDataLayer;
 begin
   saveCurrentToProgram(FCurProgram);
-  CodeSite.Send('Get State Called with Program='+ FCurProgram.ToString);
+  WriteLog('Get State Called with Program='+ FCurProgram.ToString);
   sl:=TDataLayer.Create;
   sl.setAttributeI('CurProgram',FCurProgram);
   ssl:=TDataLayer.Create;
@@ -157,7 +157,7 @@ procedure TVST3Controller.SetEditorState(state:string);
 VAR i,TempProgram:integer;
     sl,ssl:TDataLayer;
 begin
-  CodeSite.Send('Set State: LOADING...');
+  WriteLog('Set State: LOADING...');
   sl:=TDataLayer.Create;
   sl.Text:=state;
   TempProgram:=sl.getAttributeI('CurProgram');
@@ -219,7 +219,7 @@ begin
   for i:=0 to PROGRAMCOUNT-1 do
     saveCurrentToProgram(i);
   //////////////////////////////////////////
-  CodeSite.Send('INIT: NumParams = '+FnumUserParameters.ToString);
+  WriteLog('INIT: NumParams = '+FnumUserParameters.ToString);
   AddParameter(IDPARMProgram, 'Program','Program','',0,PROGRAMCOUNT-1,0,false,PROGRAMCOUNT-1,true);
   for i:=0 to 127 do
   begin
@@ -496,10 +496,10 @@ procedure TVST3Controller.ControllerParameterSetValue(id: integer; value: double
 VAR index:integer;
 const   MIDI_CC = $B0;
 begin
-  CodeSite.Send('ControllerParameterSetValue:'+id.ToString+' '+value.ToString);
+  WriteLog('ControllerParameterSetValue:'+id.ToString+' '+value.ToString);
   if isMidiCCId(id) then
   begin
-    CodeSite.Send('ParameterSetValue MIDI ???:'+id.ToString+' '+value.ToString);
+    WriteLog('ParameterSetValue MIDI ???:'+id.ToString+' '+value.ToString);
     exit;
   end;
 
@@ -508,7 +508,7 @@ begin
   if (value<0) or (value>1) then exit;
   if id = IDPARMProgram then
   begin
-    CodeSite.Send('Program Change');
+    WriteLog('Program Change');
     SetProgram(round(value*(PROGRAMCOUNT-1)),true,true);
   end
   else
@@ -519,7 +519,7 @@ procedure TVST3Controller.ProcessorParameterSetValue(id:integer;value:double);
 VAR index:integer;
 const   MIDI_CC = $B0;
 begin
-// not from ui.. !! CodeSite.Send('ProcessorOnUpdateParameter: '+id.ToString+' '+value.ToString);
+// not from ui.. !! WriteLog('ProcessorOnUpdateParameter: '+id.ToString+' '+value.ToString);
   if isMidiCCId(id) then
   begin
     index:=id-MIDICC_SIMULATION_START;
@@ -581,7 +581,7 @@ begin
   // Copy To self
   if sl.getAttributeI('MAGIC')<>2136 then
   begin
-    CodeSite.Send('SetState; Invalid magic UNEXPECTED');
+    WriteLog('SetState; Invalid magic UNEXPECTED');
     exit;
   end;
   setLength(values,numParams);

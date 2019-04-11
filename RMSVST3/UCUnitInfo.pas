@@ -51,7 +51,7 @@ implementation
 
 { CUnitInfo }
 
-uses CodeSiteLogging, UVST3Utils;
+uses UCodeSiteLogger, UVST3Utils;
 
 constructor CUnitInfo.Create(const Controller: IVST3Controller);
 begin
@@ -136,7 +136,7 @@ end;
 
 function CUnitInfo.SetUnitProgramData(listOrUnitId: TProgramListID;  programIndex: int32; data: IBStream): TResult;
 begin
-  CodeSite.Send('CUnitInfo.SetUnitProgramData');
+  WriteLog('CUnitInfo.SetUnitProgramData');
   result:=kResultTrue;
 end;
 

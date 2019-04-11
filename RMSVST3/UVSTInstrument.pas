@@ -37,11 +37,11 @@ type TVSTInstrument = TVST3Instrument;  // don't expand this type with own metho
 
 implementation
 
-uses UCAudioProcessor,UCComponent,UCEditController,UCMidiMapping,UCUnitInfo,CodeSiteLogging;
+uses UCAudioProcessor,UCComponent,UCEditController,UCMidiMapping,UCUnitInfo,UCodeSiteLogger;
 
 constructor TVST3Instrument.Create;
 begin
-  CodeSite.Send('TVST3Instrument.Create');
+  WriteLog('TVST3Instrument.Create');
 
   inherited;
   FAudioProcessor:=CAudioProcessor.Create(self);

@@ -26,14 +26,14 @@ implementation
 
 { CPluginFactory }
 
-uses CodeSiteLogging,SysUtils,UCEditController,UVST3Utils ;
+uses UCodeSiteLogger,SysUtils,UCEditController,UVST3Utils ;
 
 const CLTYPE_CONTROLLER = 28;
 const CLTYPE_PROCESSOR = 27;
 
 function CPluginFactory.CountClasses: int32;
 begin
-  CodeSite.Send('CPluginFactory.CountClasses');
+  WriteLog('CPluginFactory.CountClasses');
   result:=1;  //
 end;
 
@@ -71,7 +71,7 @@ VAR instance:FUnknown;
     res:integer;
     fPlugin:TVSTBase;
 begin
-  CodeSite.Send('CPluginFactory.CreateInstance:'+UIDPCharToNiceString(iid));
+  WriteLog('CPluginFactory.CreateInstance:'+UIDPCharToNiceString(iid));
   found:=false;
   if UIDMatch(TUID(fPluginInfo.PluginDef.vst3id),cid) then
   begin
@@ -101,7 +101,7 @@ end;
 function CPluginFactory.GetClassInfo(index: int32; var info: TPClassInfo): TResult;
 VAR i:integer;
 begin
-  CodeSite.Send('CPluginFactory.GetClassInfo:'+inttostr(index));
+  WriteLog('CPluginFactory.GetClassInfo:'+inttostr(index));
   with fClassInfo2 do
   begin
     info.cid:=cid;
@@ -116,7 +116,7 @@ end;
 
 function CPluginFactory.GetClassInfo2(index: int32;  var info: TPClassInfo2): TResult;
 begin
-  CodeSite.Send('CPluginFactory.GetClassInfo2:'+' '+IntToStr(index));
+  WriteLog('CPluginFactory.GetClassInfo2:'+' '+IntToStr(index));
   info:=fClassInfo2;
   result:=kResultOK;
 end;

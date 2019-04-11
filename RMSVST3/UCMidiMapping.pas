@@ -12,13 +12,13 @@ end;
 
 implementation
 
-uses CodeSiteLogging;
+uses UCodeSiteLogger;
 
 constructor CMidiMapping.Create(const Controller: IVST3Controller);
 begin
   inherited Create(controller);
   IVST3:=Controller;
-  CodeSite.Send('CMidiMapping.Create');
+  WriteLog('CMidiMapping.Create');
 end;
 
 function CMidiMapping.getMidiControllerAssignment(busIndex: int32;  channel: int16; midiControllerNumber: TCtrlNumber;  out tag: TParamID): TResult;

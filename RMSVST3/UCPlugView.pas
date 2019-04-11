@@ -50,7 +50,7 @@ public
 
 implementation
 
-uses CodeSiteLogging,UVST3Utils,SysUtils, Windows;
+uses UCodeSiteLogger,UVST3Utils,SysUtils, Windows;
 
 { CPlugView }
 
@@ -58,7 +58,7 @@ function CPlugView.Attached(parent: pointer; aType: FIDString): TResult;
 begin
   result:=kResultFalse;
   if parent=NIL then exit;
-  CodeSite.Send('CPlugView.Attached');
+  WriteLog('CPlugView.Attached');
   if FeditorForm = NIL then
     FeditorForm:=IVST3.CreateForm(parent);
 //    if IVST3.editorFormClass <> NIL then
@@ -77,7 +77,7 @@ end;
 
 function CPlugView.CanResize: TResult;
 begin
-  CodeSite.Send('CPlugView.Attached');
+  WriteLog('CPlugView.Attached');
   result:=kResultOk;
 end;
 
@@ -94,7 +94,7 @@ end;
 
 function CPlugView.GetSize(size: PViewRect): TResult;
 begin
-  CodeSite.Send('CPlugView.GetSize:');
+  WriteLog('CPlugView.GetSize:');
   size.left:=0;
   size.top:=0;
   size.right:=1000;
@@ -109,7 +109,7 @@ end;
 
 function CPlugView.IsPlatformTypeSupported(aType: FIDString): TResult;
 begin
-  CodeSite.Send('CPlugView.IsPlatformTypeSupported:' + aType);
+  WriteLog('CPlugView.IsPlatformTypeSupported:' + aType);
   if aType = 'HWND' then result:=kResultOk
                     else result:=kResultFalse;
 end;
@@ -131,7 +131,7 @@ end;
 
 function CPlugView.OnSize(newSize: PViewRect): TResult;
 begin
-  CodeSite.Send('CPlugView.OnSize');
+  WriteLog('CPlugView.OnSize');
   result:=kResultOk;
 end;
 
@@ -142,7 +142,7 @@ end;
 
 function CPlugView.Removed: TResult;
 begin
-  CodeSite.Send('CPlugView.Removed');
+  WriteLog('CPlugView.Removed');
   IVST3.EditClose;
   FEditorForm.Parent:=NIL;
   FeditorForm.Free;
@@ -152,7 +152,7 @@ end;
 
 function CPlugView.SetFrame(frame: IPlugFrame): TResult;
 begin
-  CodeSite.Send('CPlugView.SetFrame');
+  WriteLog('CPlugView.SetFrame');
   result:=kResultOk;
 end;
 

@@ -41,11 +41,11 @@ implementation
 
 { CComponent }
 
-uses CodeSiteLogging,UVST3Utils;
+uses UCodeSiteLogger,UVST3Utils;
 
 function CComponent.ActivateBus(vType: TMediaType; dir: TBusDirection;  index: int32; state: TBool): TResult;
 begin
-  CodeSite.Send('CComponent.ActivateBus');
+  WriteLog('CComponent.ActivateBus');
   result:=kResultOk;
 end;
 
@@ -57,13 +57,13 @@ end;
 
 function CComponent.GetBusCount(vType: TMediaType; dir: TBusDirection): int32;
 begin
-//  CodeSite.Send('CComponent.GetBusCount');
+//  WriteLog('CComponent.GetBusCount');
   result:=1; // just one in and out
 end;
 
 function CComponent.GetBusInfo(vType: TMediaType; dir: TBusDirection; index: int32; var bus: TBusInfo): TResult;
 begin
-//  CodeSite.Send('CComponent.GetBusInfo');
+//  WriteLog('CComponent.GetBusInfo');
   bus.mediaType:=vType;
   bus.direction:=dir;
   bus.name:='RMS Bus';
@@ -75,20 +75,20 @@ end;
 
 function CComponent.GetControllerClassId(var classId: TUID): TResult;
 begin
-  CodeSite.Send('CComponent.GetControllerClassId');
+  WriteLog('CComponent.GetControllerClassId');
   classId:=TUID(IVST3.GetPluginInfo.PluginDef.vst3id);
   result:=kResultOk;
 end;
 
 function CComponent.GetRoutingInfo(var inInfo, outInfo: TRoutingInfo): TResult;
 begin
-  CodeSite.Send('CComponent.GetRoutingInfo');
+  WriteLog('CComponent.GetRoutingInfo');
   result:=kResultOk;
 end;
 
 function CComponent.GetState(state: IBStream): TResult;
 begin
-  CodeSite.Send('CComponent.GetState');
+  WriteLog('CComponent.GetState');
 // In reaper,and with a combined Component, EditController it is not needed to Getstate/SetState
   WriteStream(state,STREAMMAGIC_PROCESSOR,IVST3.GetProcessorState);
   result:=kResultOk;
@@ -97,7 +97,7 @@ end;
 function CComponent.Initialize(context: FUnknown): TResult;
 begin
   result:=kResultOk;
-  CodeSite.Send('CComponent.Initialize');
+  WriteLog('CComponent.Initialize');
   if FhostContext <> NIL then exit;
   FHostContext:=context;
   FHostContext._addRef;
@@ -106,20 +106,20 @@ end;
 
 function CComponent.SetActive(state: TBool): TResult;
 begin
-  CodeSite.Send('CComponent.SetActive');
+  WriteLog('CComponent.SetActive');
   IVST3.SetActive(state<>0);
   result:=kResultOk;
 end;
 
 function CComponent.SetIoMode(mode: TIoMode): TResult;
 begin
-  CodeSite.Send('CComponent.SetIoMode');
+  WriteLog('CComponent.SetIoMode');
   result:=kNotImplemented;
 end;
 
 function CComponent.SetState(state: IBStream): TResult;
 begin
-  CodeSite.Send('CComponent.SetState');
+  WriteLog('CComponent.SetState');
 // In reaper,and with a combined Component, EditController is not needed to Getstate/SetState
   IVST3.SetProcessorState(ReadStream(state,STREAMMAGIC_PROCESSOR));
   result:=kResultTrue;
@@ -127,7 +127,7 @@ end;
 
 function CComponent.Terminate: TResult;
 begin
-  CodeSite.Send('CComponent.Terminate');
+  WriteLog('CComponent.Terminate');
   IVST3.ProcessorTerminate;
   result:=kResultOk;
 end;

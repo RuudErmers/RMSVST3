@@ -27,11 +27,11 @@ implementation
 
 { CAudioProcessor }
 
-uses CodeSiteLogging, SysUtils, UVSTBase;
+uses UCodeSiteLogger, SysUtils, UVSTBase;
 
 function CAudioProcessor.CanProcessSampleSize( symbolicSampleSize: int32): TResult;
 begin
-  CodeSite.Send('CAudioProcessor.CanProcessSampleSize:'+symbolicSampleSize.ToString);
+  WriteLog('CAudioProcessor.CanProcessSampleSize:'+symbolicSampleSize.ToString);
   result:=kResultFalse;
   if symbolicSampleSize=kSample32 then
      result:=kResultTrue;
@@ -41,13 +41,13 @@ constructor CAudioProcessor.Create(const Controller: IVST3Processor);
 begin
   inherited Create(controller);
   IVST3:=Controller;
-  CodeSite.Send('CAudioProcessor.Create');
+  WriteLog('CAudioProcessor.Create');
   FhostContext:=NIL;
 end;
 
 function CAudioProcessor.GetBusArrangement(dir: TBusDirection; index: int32;  var arr: TSpeakerArrangement): TResult;
 begin
-  CodeSite.Send('CAudioProcessor.GetBusArrangement');
+  WriteLog('CAudioProcessor.GetBusArrangement');
 (* JUCE Version
         if (auto* bus = pluginInstance->getBus (dir == Vst::kInput, index))
         {
@@ -63,13 +63,13 @@ end;
 
 function CAudioProcessor.GetLatencySamples: uint32;
 begin
-//  CodeSite.Send('CAudioProcessor.GetLatencySamples');
+//  WriteLog('CAudioProcessor.GetLatencySamples');
   result:=0;
 end;
 
 function CAudioProcessor.GetTailSamples: uint32;
 begin
-  CodeSite.Send('CAudioProcessor.GetTailSamples');
+  WriteLog('CAudioProcessor.GetTailSamples');
   result:=kNoTail;
 end;
 
@@ -193,7 +193,7 @@ function CAudioProcessor.Process(var data: TProcessData): TResult;
       if playstateChanged then IVST3.PlayStateChanged(FPlaying,FPPQ);
     end;
 begin
-//  CodeSite.Send('CAudioProcessor.Process');
+//  WriteLog('CAudioProcessor.Process');
   if (data.inputEvents<>NIL) then ProcessEvents;
   if (data.inputParameterChanges<>NIL) then ProcessParameters;
   if (data.numSamples>0) then ProcessAudio;
@@ -204,20 +204,20 @@ end;
 
 function CAudioProcessor.SetBusArrangements(inputs: PSpeakerArrangement;  numIns: int32; outputs: PSpeakerArrangement; numOuts: int32): TResult;
 begin
-  CodeSite.Send('CAudioProcessor.SetBusArrangement');
+  WriteLog('CAudioProcessor.SetBusArrangement');
 	result:=kResultTrue;
 end;
 
 function CAudioProcessor.SetProcessing(state: TBool): TResult;
 begin
-  CodeSite.Send('CAudioProcessor.SetProcessing');
+  WriteLog('CAudioProcessor.SetProcessing');
 	result:=kResultTrue;
 end;
 
 
 function CAudioProcessor.SetupProcessing(var setup: TProcessSetup): TResult;
 begin
-  CodeSite.Send('CAudioProcessor.SetupProcessing');
+  WriteLog('CAudioProcessor.SetupProcessing');
 	result:=kResultTrue;
 (* JUCE Version
    if (canProcessSampleSize (newSetup.symbolicSampleSize) != kResultTrue)

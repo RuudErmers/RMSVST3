@@ -98,10 +98,7 @@ function CreatePlugin(Host:TFruityPlugHost;Tag:TPluginTag;pluginInfo:TVSTInstrum
 
 implementation
 
-uses CodeSiteLogging;
-
-{$DEFINE DebugLog}
-
+uses UCodeSiteLogger;
 
 // create an initialized plugin & return a pointer to the struct
 function CreatePlugin(Host:TFruityPlugHost;Tag:TPluginTag;pluginInfo:TVSTInstrumentInfo): TFruityPlug;
@@ -118,6 +115,7 @@ begin
     ptr^:=AnsiChar(s[i]);
     inc(ptr);
   end;
+  ptr^:=#0
 end;
 
 function AssignString(ptr:pAnsiChar):string;overload;
@@ -161,14 +159,14 @@ begin
   fPlugin.OnFinalize;
   inherited;
 
- {$IFDEF DebugLog} CodeSite.Send('TRMSFruityPlug.DestroyObject '); {$ENDIF}
+  WriteLog('TRMSFruityPlug.DestroyObject ');
 end;
 
 
 function TRMSFruityPlug.Dispatcher(ID, Index, Value: IntPtr): IntPtr;
 begin
   Result := 0;
-//  {$IFDEF DebugLog} CodeSite.Send('Dispatcher ('+Id.ToString+' ' + Index.ToString+' '+Value.ToString + ')'); {$ENDIF}
+//  WriteLog('Dispatcher ('+Id.ToString+' ' + Index.ToString+' '+Value.ToString + ')');
   case ID of
      // show the editor
      FPD_ShowEditor:
@@ -218,7 +216,7 @@ function TRMSFruityPlug.TriggerVoice(VoiceParams: PVoiceParams; SetTag: IntPtr):
 VAR pitch,velocity:integer;
 begin
 // if you want to create a 'midievent' from this use VoiceParams.FinalLevels.Pitch
- {$IFDEF DebugLog} CodeSite.Send('TRMSFruityPlug.TriggerVoice (' + VoiceParams.FinalLevels.Pitch.ToString + ')'); {$ENDIF}
+  WriteLog('TRMSFruityPlug.TriggerVoice (' + VoiceParams.FinalLevels.Pitch.ToString + ')');
 
   pitch:=round(60+VoiceParams.FinalLevels.Pitch/100);
   if pitch<=0 then pitch:=0;
@@ -234,7 +232,7 @@ end;
 procedure TRMSFruityPlug.Voice_Release(Handle: TVoiceHandle);
 VAR pitch:integer;
 begin
- {$IFDEF DebugLog} CodeSite.Send('TRMSFruityPlug.Voice_Release (' + Handle.ToString + ')'); {$ENDIF}
+  WriteLog('TRMSFruityPlug.Voice_Release (' + Handle.ToString + ')');
   pitch:=FVoiceTag[Handle].pitch;
   fPlugin.OnMidiEvent(MIDI_NOTE_OFF,pitch,64);
   PlugHost.Voice_Kill(FVoiceTag[Handle].Tag, TRUE)
@@ -243,7 +241,7 @@ end;
 // free a voice
 procedure TRMSFruityPlug.Voice_Kill(Handle: TVoiceHandle);
 begin
- {$IFDEF DebugLog} CodeSite.Send('TRMSFruityPlug.Voice_Kill (' + Handle.ToString + ')'); {$ENDIF}
+  WriteLog('TRMSFruityPlug.Voice_Kill (' + Handle.ToString + ')');
   // make sure this method is not abstract
 end;
 
@@ -322,12 +320,12 @@ begin
        ThisValue:=TranslateMIDI(ThisValue, 0, 65535);
   if RECFlags and REC_UpdateValue <> 0 then
   begin
- {$IFDEF DebugLog} CodeSite.Send('ProcessParam UPDATE (' + ThisIndex.ToString + ' '+ThisValue.ToString + ')'); {$ENDIF}
+    WriteLog('ProcessParam UPDATE (' + ThisIndex.ToString + ' '+ThisValue.ToString + ')');
     fPlugin.InternalSetParameter(ThisIndex, ThisValue/65536);
   end;
   if RECFlags and REC_GetValue <> 0 then
   begin
-   {$IFDEF DebugLog} CodeSite.Send('ProcessParam GET (' + ThisIndex.ToString + ' '+ThisValue.ToString + ')'); {$ENDIF}
+   WriteLog('ProcessParam GET (' + ThisIndex.ToString + ' '+ThisValue.ToString + ')');
    ThisValue:=round(fPlugin.getParameterValue(ThisIndex)*65536);
   end;
   Result:=ThisValue;
@@ -398,7 +396,7 @@ VAR i,saveMsg:integer;
     b:array[0..3] of byte;
 const  MIDI_CC = $B0;
 begin
- {$IFDEF DebugLog} CodeSite.Send('TRMSFruityPlug.MIDIIn'+ Msg.ToString + ')'); {$ENDIF}
+  WriteLog('TRMSFruityPlug.MIDIIn'+ Msg.ToString + ')');
 // For now, I will only react to MIDI_CC
 // We could use this to process Noteon/Off as well, but then midi thru does not work
   saveMsg:=msg;

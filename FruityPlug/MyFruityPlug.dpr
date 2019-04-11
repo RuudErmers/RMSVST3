@@ -18,7 +18,8 @@ uses
   UVSTBase in '..\FrameworkCommon\UVSTBase.pas',
   UMyVSTForm in '..\SimpleSynthCommon\UMyVSTForm.pas' {FormMyVST},
   UPianoKeyboard in '..\SimpleSynthCommon\UPianoKeyboard.pas',
-  UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas';
+  UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas',
+  UCodeSiteLogger in '..\FrameworkCommon\UCodeSiteLogger.pas';
 
 {$R *.RES}
 

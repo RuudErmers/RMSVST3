@@ -42,7 +42,7 @@ type
 
 implementation
 
-uses CodeSiteLogging,SysUtils;
+uses UCodeSiteLogger,SysUtils;
 
 procedure TVST3Processor.TempoChanged(tempo: single);
 begin
