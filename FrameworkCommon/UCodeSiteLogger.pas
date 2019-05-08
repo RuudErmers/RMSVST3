@@ -36,7 +36,7 @@ end;
 procedure WriteLog(s:string);
 begin
   if not Enabled then exit;
-  WriteLog(s);
+  CodeSite.Send(s);
 end;
 
 begin
