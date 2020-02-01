@@ -76,30 +76,52 @@ end;
 {$POINTERMATH ON}
 
 function CAudioProcessor.Process(var data: TProcessData): TResult;
-(* this does not (yet?) work in reaper...
-    procedure MidiOut(byte0,byte1,byte2:integer);
+//(* this does! not work in reaper...
+const MIDI_NOTE_ON = $90;
+      MIDI_NOTE_OFF = $80;
+      MIDI_CC = $B0;
+    procedure ProcessMidiOut;
+    VAR buffer:TArray<integer>;
     VAR event:TVstEvent;
+        i,status,midichannel,data1,data2:integer;
+        doAdd:boolean;
     begin
-    	event.busIndex := 0;
-	    event.sampleOffset := 0;
-    	event.ppqPosition := 0;
-    	event.flags := 0;
-
-    	event.eventType := kLegacyMIDICCOutEvent;
-	    event.midiCCOut.channel := byte0 and $F;
-	    event.midiCCOut.controlNumber := byte1;
-	    event.midiCCOut.value := byte2;
-	    event.midiCCOut.value2 := 0;
-(*    	event.eventType := kNoteOnEvent;
-	    event.noteOn.channel:= byte0 and $F;
-	    event.noteOn.pitch := byte1;
-	    event.noteOn.velocity := byte2;
-//	    event.midiCCOut.value2 := 0;  *
-
-			event.flags := kIsLive;
-      data.outputEvents.AddEvent(event)
+      buffer:=IVST3.GetMidiOutputEvents;
+      for i:=0 to length(buffer)-1 do
+      begin
+       	event.busIndex := 0;
+	      event.sampleOffset := 0;
+    	  event.ppqPosition := 0;
+    	  event.flags := 0;
+        status:=buffer[i] and $F0;
+        midichannel:=buffer[i] and $F;
+        data1:= (buffer[i] SHR 8) and $7F;
+        data2:= (buffer[i] SHR 16) and $7F;
+        doAdd:=true;
+        case status of
+          MIDI_NOTE_ON:  begin
+                           event.eventType := kNoteOnEvent;
+                     	     event.noteOn.channel:= midichannel;
+                      	   event.noteOn.pitch := data1;
+                     	     event.noteOn.velocity := data2/127;
+                         end;
+          MIDI_NOTE_OFF: begin
+                           event.eventType := kNoteOffEvent;
+                     	     event.noteOn.channel:= midichannel;
+                      	   event.noteOn.pitch := data1;
+                     	     event.noteOn.velocity := data2/127;
+                         end;
+          MIDI_CC:       begin
+    	                     event.eventType := kLegacyMIDICCOutEvent;
+                     	     event.midiCCOut.channel := midichannel;
+                      	   event.midiCCOut.controlNumber := data1;
+                     	     event.midiCCOut.value := data2;
+                         end;
+          else doAdd:=false;
+        end;
+        if doAdd then data.outputEvents.AddEvent(event);
+      end;
     end;
-*)
     procedure ProcessEvents;
     VAR numEvents,index:integer;
         event:TVstEvent;
@@ -109,8 +131,7 @@ function CAudioProcessor.Process(var data: TProcessData): TResult;
       result:='';
       for i:=0 to event.data.size-1 do result:=result+chr(event.data.bytes[i]);
     end;
-    const MIDI_NOTE_ON = $90;
-          MIDI_NOTE_OFF = $80;
+
     begin
       numEvents:=data.inputEvents.GetEventCount;
       for index:=0 to numEvents-1 do
@@ -144,7 +165,6 @@ function CAudioProcessor.Process(var data: TProcessData): TResult;
           for j:=0 to numPoints-1 do
                   if (paramQueue.getPoint (j, sampleOffset, value) = kResultTrue) then
                      IVST3.ProcessorParameterSetValue(paramQueue.getParameterId,value);
-// first test...     MidiOut(0,60,80);
          end;
       end;
     end;
@@ -198,6 +218,7 @@ begin
   if (data.inputParameterChanges<>NIL) then ProcessParameters;
   if (data.numSamples>0) then ProcessAudio;
   if data.processContext<>NIL then ProcessContext;
+  if data.outputEvents<>NIL then ProcessMidiOut;
 	result:=kResultTrue;
 end;
 
@@ -219,21 +240,6 @@ function CAudioProcessor.SetupProcessing(var setup: TProcessSetup): TResult;
 begin
   WriteLog('CAudioProcessor.SetupProcessing');
 	result:=kResultTrue;
-(* JUCE Version
-   if (canProcessSampleSize (newSetup.symbolicSampleSize) != kResultTrue)
-            return kResultFalse;
-
-        processSetup = newSetup;
-        processContext.sampleRate = processSetup.sampleRate;
-
-        getPluginInstance().setProcessingPrecision (newSetup.symbolicSampleSize == Vst::kSample64
-                                                        ? AudioProcessor::doublePrecision
-                                                        : AudioProcessor::singlePrecision);
-
-        preparePlugin (processSetup.sampleRate, processSetup.maxSamplesPerBlock);
-
-        return kResultTrue;
-   JUCE Version *)
 end;
 
 

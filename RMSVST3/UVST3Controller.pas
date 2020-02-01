@@ -65,6 +65,7 @@ type TVST3Parameter  = record
         FProcessorHandler:IProcessorHandler;
         FIdleTimer:TTimer;
         FSomethingDirty:boolean;
+        FMidiEventQueue:TArray<integer>;
         procedure saveCurrentToProgram(prgm:integer);
         procedure SetProgram(prgm:integer;saveCurrent:boolean;updateProcessor:boolean);
         function ParmLookup(id: integer): integer;
@@ -106,12 +107,16 @@ type TVST3Parameter  = record
         function getParameterAsString(id: integer; value: double): string; virtual;
         procedure OnProgramChange(prgm:integer);virtual;
         function  GetEditorClass: TFormClass;virtual;
+        function GetMidiOutputEvents:TArray<integer>;override;final;
         procedure OnEditOpen;virtual;
         procedure OnEditClose;virtual;
         procedure OnEditIdle;virtual;
         procedure UpdateEditorParameter(id:integer;value:double);virtual;
         procedure OnInitialize;virtual;
         procedure OnFinalize;virtual;
+        procedure DoMidiEvent(byte0, byte1, byte2: integer);
+        procedure doProgramChange(prgm:integer);
+
    public
         constructor Create; override;
    end;
@@ -152,6 +157,24 @@ begin
   sl.Free;
 end;
 
+procedure TVST3Controller.DoMidiEvent(byte0, byte1, byte2: integer);
+VAR l:integer;
+begin
+  l:=length(FMidiEventQueue);
+  SetLength(FMidiEventQueue,l+1);
+  FMidiEventQueue[l]:=byte0+byte1 SHL 8 + byte2 SHL 16;
+end;
+
+procedure TVST3Controller.doProgramChange(prgm: integer);
+begin
+  SetProgram(prgm,true,true);
+end;
+
+function TVST3Controller.GetMidiOutputEvents: TArray<integer>;
+begin
+  result:=FMidiEventQueue;
+  SetLength(FMidiEventQueue,0);
+end;
 
 procedure TVST3Controller.SetEditorState(state:string);
 VAR i,TempProgram:integer;

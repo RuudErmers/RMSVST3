@@ -3,7 +3,6 @@ unit UMyVst;
 interface
 
 uses UVSTInstrument,Forms, Classes,UVSTBase,UMyVSTDSP;
-type TOnParameterChanged = procedure (id:integer;value:double) of object;
 
 const ID_CUTOFF = 17;
 const ID_RESONANCE = 18;
@@ -12,6 +11,7 @@ const ID_PULSEWIDTH = 19;
 type TMyVSTPlugin = class (TVSTInstrument)
 private
   FSimpleSynth:TSimpleSynth;
+    procedure DoUpdateHostParameter(id: integer; value: double);
 protected
   procedure Process32(samples,channels:integer;inputp, outputp: PPSingle);override;
   procedure UpdateProcessorParameter(id:integer;value:double);override;
@@ -20,7 +20,8 @@ protected
   procedure OnEditOpen;override;
   procedure OnProgramChange(prgm:integer);override;
   procedure OnMidiEvent(byte0, byte1, byte2: integer);override;
-  procedure onKeyEvent(key: integer; _on: boolean);
+  procedure onKeyEvent(key: integer; _on: boolean); // called from Host
+  procedure doKeyEvent(key: integer; _on: boolean); // called from UI
 public
 end;
 
@@ -57,6 +58,9 @@ begin
   AddParameter(ID_CUTOFF,'Cutoff','Cutoff','Hz',20,20000,10000);
   AddParameter(ID_RESONANCE,'Resonance','Resonance','',0,1,0);
   AddParameter(ID_PULSEWIDTH,'Pulse Width','PWM','%',0,100,50);
+//  AddProgram('Program 1');
+//  AddProgram('Program 2');
+//  AddProgram('Program 3');
 end;
 
 procedure TMyVSTPlugin.OnMidiEvent(byte0, byte1, byte2: integer);
@@ -93,13 +97,32 @@ end;
 procedure TMyVSTPlugin.OnEditOpen;
 begin
   ResendParameters;
-  TFormMyVST(EditorForm).UpdateHostParameter:=UpdateHostParameter;
-  TFormMyVST(EditorForm).OnKeyEvent:=OnKeyEvent;
+  TFormMyVST(EditorForm).HostUpdateParameter:=DoUpdateHostParameter;
+  TFormMyVST(EditorForm).HostKeyEvent:=DoKeyEvent;
+  TFormMyVST(EditorForm).HostPrgmChange:=DoProgramChange;
 end;
 
-procedure TMyVSTPlugin.onKeyEvent(key:integer;_on:boolean);
+procedure TMyVSTPlugin.onKeyEvent(key:integer;_on:boolean); // from Host
+const MIDI_NOTE_ON = $90;
+      MIDI_NOTE_OFF = $80;
 begin
   FSimpleSynth.OnKeyEvent(key,_on);
+end;
+
+procedure TMyVSTPlugin.doKeyEvent(key:integer;_on:boolean); // from UI
+const MIDI_NOTE_ON = $90;
+      MIDI_NOTE_OFF = $80;
+begin
+  FSimpleSynth.OnKeyEvent(key,_on);
+  DoMidiEvent(MIDI_NOTE_ON,key,127*ord(_on));   // just a test
+end;
+
+
+procedure TMyVSTPlugin.DoUpdateHostParameter(id: integer; value: double);
+const MIDI_CC = $B0;
+begin
+  UpdateHostParameter(id,value);
+  DoMidiEvent(MIDI_CC,id,round(127*value));   // just a test
 end;
 
 procedure TMyVSTPlugin.UpdateEditorParameter(id: integer;  value: double);

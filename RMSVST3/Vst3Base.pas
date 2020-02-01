@@ -708,7 +708,7 @@ type
 ******************)
 
 const
-     kVstVersionString = 'VST 3.6.12';  // SDK version for PClassInfo2
+     kVstVersionString = 'VST 3.6.14';  // SDK version for PClassInfo2
 
      kVstVersionMajor = 3;
      kVstVersionMinor = 6;
@@ -3231,7 +3231,9 @@ const
 const
      kAttributesFlagsHideableFlag = 'hideable';  // the associated layer marked as hideable allows a remote to hide or make it not usable a parameter when the associated value is inactive
 
-implementation
 
-end.
-
+implementation
+
+
+end.
+

@@ -71,4 +71,13 @@ object FormMyVST: TFormMyVST
     TabOrder = 2
     OnChange = ScrollBar1Change
   end
+  object Button1: TButton
+    Left = 160
+    Top = 167
+    Width = 75
+    Height = 25
+    Caption = 'Set Prgm 1'
+    TabOrder = 3
+    OnClick = Button1Click
+  end
 end
