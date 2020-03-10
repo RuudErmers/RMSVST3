@@ -103,7 +103,4 @@ begin
       result:=result+chr(buffer[i]);
 end;
 
-
-
-
 end.
