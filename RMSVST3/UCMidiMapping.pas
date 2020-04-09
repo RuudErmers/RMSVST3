@@ -22,9 +22,15 @@ begin
 end;
 
 function CMidiMapping.getMidiControllerAssignment(busIndex: int32;  channel: int16; midiControllerNumber: TCtrlNumber;  out tag: TParamID): TResult;
+VAR t:integer;
 begin
-  Tag:=IVST3.GetMidiCCParamID(channel,midiControllerNumber);
-  Result:= kResultOk;
+  t:=IVST3.GetMidiCCParamID(channel,midiControllerNumber);
+  if t>=0 then begin
+                 Tag:=t;
+                 Result:=kResultOk;
+               end
+          else
+            result:=kResultFalse;
 end;
 
 end.

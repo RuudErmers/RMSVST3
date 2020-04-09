@@ -9,13 +9,13 @@ private
   factoryInfo:TPFactoryInfo;
   fClassInfo2:TPClassInfo2;
   fpluginInfo:TVSTInstrumentInfo;
-  function MYGetFactoryInfo(var info: TPFactoryInfo): TResult;  stdcall;
+  function GetFactoryInfo(var info: TPFactoryInfo): TResult;  stdcall;
   function CountClasses: int32;  stdcall;
   function GetClassInfo(index: int32; var info: TPClassInfo): TResult;  stdcall;
   function CreateInstance(cid, iid: PAnsiChar; var obj: pointer): TResult;  stdcall;
+  function GetClassInfo2(index: int32; var info: TPClassInfo2): TResult; stdcall;
 // IPluginFactory3  function GetClassInfoUnicode(index: int32; var info: TPClassInfoW): TResult;  stdcall;
 // IPluginFactory3  function SetHostContext(context: FUnknown): TResult;  stdcall;
-  function GetClassInfo2(index: int32; var info: TPClassInfo2): TResult; stdcall;
 public
   constructor Create(pluginInfo:TVSTInstrumentInfo);
 end;
@@ -39,6 +39,8 @@ end;
 
 constructor CPluginFactory.Create(pluginInfo:TVSTInstrumentInfo);
 begin
+  WriteLog('CPluginFactory.Create:');
+
   inherited create;
   fPluginInfo:=pluginInfo;
   with fPlugInInfo.factoryDef do
@@ -46,20 +48,21 @@ begin
     AssignString(factoryInfo.vendor,vendor);
     AssignString(factoryInfo.url,url);
     AssignString(factoryInfo.email,email);
+    factoryInfo.flags:=kUnicode; //kNoFlags;
   end;
 
   with fClassInfo2 do
   begin
       cid := TUID(pluginInfo.PluginDef.vst3id);
       cardinality:=     kManyInstances;
-      category:=        kVstAudioEffectClass;
+      AssignString(category,kVstAudioEffectClass);  // Changed..
       AssignString(name,    pluginInfo.PluginDef.name);
       classFlags:=      0;
       if pluginInfo.PluginDef.isSynth then
-        subCategories:= kInstrument
+        subCategories:= kInstrumentSynth
       else
         subCategories:= kFx;
-      sdkVersion:=      kVstVersionString;
+      AssignString(sdkVersion,     kVstVersionString); // Changed
   end;
   _addRef;
 end;
@@ -71,7 +74,8 @@ VAR instance:FUnknown;
     res:integer;
     fPlugin:TVSTBase;
 begin
-  WriteLog('CPluginFactory.CreateInstance:'+UIDPCharToNiceString(iid));
+  WriteLog('CPluginFactory.CreateInstance IID:'+UIDPCharToNiceString(iid));
+  WriteLog('CPluginFactory.CreateInstance CID:'+UIDPCharToNiceString(cid));
   found:=false;
   if UIDMatch(TUID(fPluginInfo.PluginDef.vst3id),cid) then
   begin
@@ -87,15 +91,20 @@ begin
     res:=instance.queryInterface(guid,obj);
     if res=kResultOk then
     begin
-      instance._release;
+      instance._release;  // OK, I think this must be...
       result:=kResultOk;
+      WriteLog('CPluginFactory.CreateInstance OK.');
       exit;
     end
     else
+    begin
       instance._release;
+       WriteLog('CPluginFactory.CreateInstance NOK.');
+    end;
   end;
   obj:=NIL;
   result:=kNoInterface;
+  WriteLog('CPluginFactory.CreateInstance Done.');
 end;
 
 function CPluginFactory.GetClassInfo(index: int32; var info: TPClassInfo): TResult;
@@ -106,10 +115,12 @@ begin
   begin
     info.cid:=cid;
     info.cardinality:=cardinality;
+    WriteLog('CPluginFactory.cardinality:'+inttostr(cardinality));
     for i:=0 to kClassInfoNameSize-1 do
       info.name[i]:=name[i];
+    WriteLog('CPluginFactory.kClassInfoNameSize:'+inttostr(kClassInfoNameSize));
     for i:=0 to kClassInfoCategorySize-1 do
-    info.category[i]:=category[i];
+      info.category[i]:=category[i];
   end;
   result:=kResultOK;
 end;
@@ -121,14 +132,16 @@ begin
   result:=kResultOK;
 end;
 
-function CPluginFactory.MYGetFactoryInfo(var info: TPFactoryInfo): TResult;
+function CPluginFactory.GetFactoryInfo(var info: TPFactoryInfo): TResult;
 begin
+  WriteLog('CPluginFactory.GetFactoryInfo:');
   info:=factoryInfo;
   result:=kResultOK;
 end;
 
 function CreatePlugin(pluginInfo:TVSTInstrumentInfo): pointer;stdcall;
 begin
+  WriteLog('CPluginFactory.CreatePlugin:');
   result:=IPluginFactory(CPluginFactory.Create(pluginInfo));
 end;
 

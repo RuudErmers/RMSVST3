@@ -39,15 +39,16 @@ end;
 
 constructor CAudioProcessor.Create(const Controller: IVST3Processor);
 begin
+  WriteLog('CAudioProcessor.Create');
   inherited Create(controller);
   IVST3:=Controller;
-  WriteLog('CAudioProcessor.Create');
   FhostContext:=NIL;
 end;
 
 function CAudioProcessor.GetBusArrangement(dir: TBusDirection; index: int32;  var arr: TSpeakerArrangement): TResult;
 begin
   WriteLog('CAudioProcessor.GetBusArrangement');
+  arr:=3; //
 (* JUCE Version
         if (auto* bus = pluginInstance->getBus (dir == Vst::kInput, index))
         {
@@ -76,7 +77,6 @@ end;
 {$POINTERMATH ON}
 
 function CAudioProcessor.Process(var data: TProcessData): TResult;
-//(* this does! not work in reaper...
 const MIDI_NOTE_ON = $90;
       MIDI_NOTE_OFF = $80;
       MIDI_CC = $B0;
@@ -134,6 +134,7 @@ const MIDI_NOTE_ON = $90;
 
     begin
       numEvents:=data.inputEvents.GetEventCount;
+
       for index:=0 to numEvents-1 do
       begin
         data.inputEvents.GetEvent(index,event);
@@ -160,6 +161,8 @@ const MIDI_NOTE_ON = $90;
         paramQueue:=data.inputParameterChanges.getParameterData(index);
         if (paramQueue<>NIL) then
         begin
+          WriteLog('CAudioProcessor.ProcessParameters');
+
           paramQueue._AddRef; // ??? TODO: I am truly not sure on this...
           numPoints := paramQueue.getPointCount;
           for j:=0 to numPoints-1 do
@@ -213,12 +216,14 @@ const MIDI_NOTE_ON = $90;
       if playstateChanged then IVST3.PlayStateChanged(FPlaying,FPPQ);
     end;
 begin
-//  WriteLog('CAudioProcessor.Process');
-  if (data.inputEvents<>NIL) then ProcessEvents;
-  if (data.inputParameterChanges<>NIL) then ProcessParameters;
-  if (data.numSamples>0) then ProcessAudio;
-  if data.processContext<>NIL then ProcessContext;
-  if data.outputEvents<>NIL then ProcessMidiOut;
+
+  try
+    if (data.inputEvents<>NIL) then ProcessEvents;
+    if (data.inputParameterChanges<>NIL) then ProcessParameters;
+    if (data.numSamples>0) then ProcessAudio;
+    if data.processContext<>NIL then ProcessContext;
+    if data.outputEvents<>NIL then ProcessMidiOut;
+  except end;
 	result:=kResultTrue;
 end;
 

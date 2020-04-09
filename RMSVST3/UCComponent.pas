@@ -4,7 +4,7 @@ interface
 
 uses Vst3Base,UVST3Processor;
 
-type CComponent = class(TAggregatedObject,IComponent)
+type CComponent = class(TAggregatedObject,IComponent,IPluginBase)
 private
   FHostContext:FUnknown;
   IVST3:IVST3Processor;
@@ -45,7 +45,7 @@ uses UCodeSiteLogger,UVST3Utils;
 
 function CComponent.ActivateBus(vType: TMediaType; dir: TBusDirection;  index: int32; state: TBool): TResult;
 begin
-  WriteLog('CComponent.ActivateBus');
+//  WriteLog('CComponent.ActivateBus');
   result:=kResultOk;
 end;
 
@@ -63,7 +63,7 @@ end;
 
 function CComponent.GetBusInfo(vType: TMediaType; dir: TBusDirection; index: int32; var bus: TBusInfo): TResult;
 begin
-//  WriteLog('CComponent.GetBusInfo');
+ // WriteLog('CComponent.GetBusInfo');
   bus.mediaType:=vType;
   bus.direction:=dir;
   bus.name:='RMS Bus';

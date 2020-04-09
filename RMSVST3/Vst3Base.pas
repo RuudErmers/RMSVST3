@@ -413,7 +413,7 @@ type
     IPluginFactory = interface(FUnknown)
       [ '{7A4D811C-5211-4A1F-AED9-D2EE0B43BF9F}' ]
       // Fill a PFactoryInfo structure with information about the Plug-In vendor.
-      function MYGetFactoryInfo(var info: TPFactoryInfo): TResult; stdcall;
+      function GetFactoryInfo(var info: TPFactoryInfo): TResult; stdcall;
       // Returns the number of exported classes by this factory.
       // If you are using the CPluginFactory implementation provided by the SDK, it returns the number of classes you registered with CPluginFactory::registerClass.
       function CountClasses: int32; stdcall;
@@ -708,7 +708,7 @@ type
 ******************)
 
 const
-     kVstVersionString = 'VST 3.6.14';  // SDK version for PClassInfo2
+     kVstVersionString = 'VST 3.6.12';  // SDK version for PClassInfo2
 
      kVstVersionMajor = 3;
      kVstVersionMinor = 6;

@@ -9,9 +9,12 @@ function UIDPCharToNiceString(iid: PAnsiChar):string;
 function PAnsiCharToTGUID(iid:PAnsiChar):TGUID;
 procedure AssignString(VAR target: array of AnsiChar; source:string);overload;
 procedure AssignString(VAR target: array of TChar; source:string);overload;
-procedure WriteStream(stream:IBStream;magic:integer;s:string);
-function  ReadStream(stream:IBStream;magic:integer):string;
-
+
+procedure WriteStream(stream:IBStream;magic:integer;s:string);
+
+function  ReadStream(stream:IBStream;magic:integer):string;
+
+
 const STREAMMAGIC_CONTROLLER = 34873946;
 const STREAMMAGIC_PROCESSOR =  84333967;
 
@@ -45,6 +48,7 @@ end;
 function UIDPCharToNiceString(iid: PAnsiChar):string;
 begin
   result:=UIDPCharToString(iid);
+  if UIDMatch(TUID(UID_FUnknown),iid) then result:='UID_FUnknown';
   if UIDMatch(TUID(UID_IComponent),iid) then result:='UID_IComponent';
   if UIDMatch(TUID(UID_IAudioProcessor),iid) then result:='UID_IAudioProcessor';
   if UIDMatch(TUID(UID_IEditController),iid) then result:='UID_IEditController';
@@ -64,7 +68,8 @@ begin
   target[l]:=#0;
 end;
 
-procedure AssignString(VAR target: array of AnsiChar; source:string);
+
+procedure AssignString(VAR target: array of AnsiChar; source:string);
 VAR i,l:integer;
 begin
   l:=length(source);
@@ -89,8 +94,10 @@ begin
 end;
 
 function  ReadStream(stream:IBStream;magic:integer):string;
-VAR buffer:TBytes;
-    s:string;
+
+VAR buffer:TBytes;
+
+    s:string;
     i,l:integer;
 begin
   stream.read(@l,sizeof(integer));
@@ -102,5 +109,9 @@ begin
     for i:=0 to l-1 do
       result:=result+chr(buffer[i]);
 end;
+
+
+
+
 
 end.

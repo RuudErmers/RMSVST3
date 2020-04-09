@@ -2,11 +2,12 @@ unit UCPlugView;
 
 interface
 
-uses Vst3Base,Forms,UVST3Controller;
+uses Vst3Base,Forms,UVST3Controller,Types;
 
 type
      CPlugView = class(TInterfacedObject,IPlugView)
      FEditorForm:TForm;
+     FFrame: IPlugFrame;
 public
       IVST3:IVST3Controller;
       function IsPlatformTypeSupported(aType: FIDString): TResult; stdcall;
@@ -55,41 +56,55 @@ uses UCodeSiteLogger,UVST3Utils,SysUtils, Windows;
 { CPlugView }
 
 function CPlugView.Attached(parent: pointer; aType: FIDString): TResult;
+var rect: TViewRect;
 begin
+  WriteLog('CPlugView.Attached');
   result:=kResultFalse;
   if parent=NIL then exit;
-  WriteLog('CPlugView.Attached');
   if FeditorForm = NIL then
     FeditorForm:=IVST3.CreateForm(parent);
-//    if IVST3.editorFormClass <> NIL then
-//      FEditorForm:=IVST3.editorFormClass.CreateParented(HWnd(parent));
   if FeditorForm<>NIL then
   with FEditorForm do
   begin
     Visible := True;
     BorderStyle := bsNone;
     SetBounds(0, 0, Width, Height);
+    rect.left:= 0; rect.top:= 0; rect.right:= Width; rect.bottom:= Height;
     Invalidate;
   end;
   IVST3.EditOpen(FEditorForm);
+  if FFrame<>nil then
+    FFrame.resizeView (self, @rect);
   result:=kResultOk;
 end;
 
 function CPlugView.CanResize: TResult;
 begin
-  WriteLog('CPlugView.Attached');
+  WriteLog('CPlugView.CanResize');
   result:=kResultOk;
 end;
 
 function CPlugView.CheckSizeConstraint(rect: PViewRect): TResult;
 begin
+  WriteLog('CPlugView.CheckSizeConstraint:'+inttostr( rect.right));
+  rect.left:=0;
+  rect.top:=0;
+  rect.right:=1000;
+  rect.bottom:=800;
+  if FeditorForm<>NIL then with FeditorForm do
+  begin
+    rect^.right:=width;
+    rect^.bottom:=height;
+  end;
   result:=kResultOk;
 end;
 
 constructor CPlugView.create(controller: IVST3Controller);
 begin
+  WriteLog('CPlugView.create');
   inherited Create;
   IVST3:=controller;
+  _AddRef;
 end;
 
 function CPlugView.GetSize(size: PViewRect): TResult;
@@ -132,6 +147,7 @@ end;
 function CPlugView.OnSize(newSize: PViewRect): TResult;
 begin
   WriteLog('CPlugView.OnSize');
+  IVST3.OnSize(Rect(newSize.left,newSize.top,newSize.right,newSize.bottom));
   result:=kResultOk;
 end;
 
@@ -153,6 +169,8 @@ end;
 function CPlugView.SetFrame(frame: IPlugFrame): TResult;
 begin
   WriteLog('CPlugView.SetFrame');
+  FFrame:= frame;
+  FFrame._AddRef;
   result:=kResultOk;
 end;
 

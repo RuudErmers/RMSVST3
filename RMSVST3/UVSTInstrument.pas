@@ -49,6 +49,7 @@ begin
   FEditController:=CEditController.Create(self);
   FMidiMapping:=CMidiMapping.Create(self);
   FUnitInfo:=CUnitInfo.Create(self);
+  ProcessorInitialize;
 end;
 
 

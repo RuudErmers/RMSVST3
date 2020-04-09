@@ -67,7 +67,7 @@ procedure TMyVSTPlugin.OnMidiEvent(byte0, byte1, byte2: integer);
   procedure KeyEvent(key:integer;_on:boolean);
   begin
     OnKeyEvent(key,_on);
-    TFormMyVST(EditorForm).SetKey(key,_on);
+// don't do this with Cubase!    TFormMyVST(EditorForm).SetKey(key,_on);
   end;
 VAR status:integer;
 const MIDI_NOTE_ON = $90;
@@ -81,6 +81,8 @@ begin
   // note that for parameter based changed, you only have to update the processor
   // we COULD make an extra method in the fw OnMidiEventEditor, but that should be discussed
   // this is perhaps one of the reasons Steinberg chose to 'depricate' midi stuff
+  WriteLog('TMyVSTPlugin.OnMidiEvent:'+byte0.ToString+' '+byte1.ToString+' '+byte2.ToString);
+
   status:=byte0 and $F0;
   if status=MIDI_NOTE_ON then KeyEvent(byte1,byte2>0)
   else if status=MIDI_NOTE_OFF then KeyEvent(byte1,false)

@@ -2,7 +2,7 @@ unit UVST3Controller;
 
 interface
 
-uses Forms,UVST3Processor,Vst3Base,UVSTBase,UCDataLayer,Generics.Collections,ExtCtrls;
+uses Forms,UVST3Processor,Vst3Base,UVSTBase,UCDataLayer,Generics.Collections,ExtCtrls,Types;
 
 const PROGRAMCOUNT = 16;
 const IDPARMProgram = 4788;
@@ -37,6 +37,7 @@ type TVST3Parameter  = record
         function CreateForm(parent:pointer):Tform;
         procedure EditOpen(form:TForm);
         procedure EditClose;
+        procedure OnSize(newSize: TRect);
         function GetParameterCount:integer;
         function GetParameterInfo(paramIndex: integer;VAR info: TParameterInfo):boolean;
         function getParameterValue(id:integer):double;
@@ -116,6 +117,7 @@ type TVST3Parameter  = record
         procedure OnFinalize;virtual;
         procedure DoMidiEvent(byte0, byte1, byte2: integer);
         procedure doProgramChange(prgm:integer);
+        procedure OnSize(newSize:TRect);virtual;
 
    public
         constructor Create; override;
@@ -254,7 +256,10 @@ end;
 
 function TVST3Controller.GetMidiCCParamID(channel,midiControllerNumber: integer): integer;
 begin
-  result:=MIDICC_SIMULATION_START+midiControllerNumber+channel*128;
+  if (channel=0) and (midiControllerNumber<128) then
+    result:=MIDICC_SIMULATION_START+midiControllerNumber+channel*128
+  else
+    result:=-1;
 end;
 
 function TVST3Controller.GetNumPrograms: integer;
@@ -378,6 +383,8 @@ end;
 
 procedure TVST3Controller.ProcessorInitialize;
 begin
+  inherited;
+  WriteLog('TVST3Controller.ProcessorInitialize');
   Initialize;
 end;
 
@@ -511,6 +518,13 @@ end;
 procedure TVST3Controller.OnProgramChange(prgm: integer);
 begin
 // virtual
+end;
+
+procedure TVST3Controller.OnSize(newSize: TRect);
+begin
+  if FeditorForm<>NIL then with newSize do
+    FeditorForm.SetBounds(left,top,width,height);
+
 end;
 
 procedure TVST3Controller.ControllerParameterSetValue(id: integer; value: double);

@@ -11,7 +11,10 @@ It is a combined Processor/Controller and implements the following:
 
 There is a simple example which implements some of the basics in an Simple Synthesizer VST. 
 There is also documentation on how to implement this wrapper code.
-Tested in Reaper and FL Studio (rudimentair)
+Tested in Reaper and FL Studio (rudimentair).
+
+Thanks to the Kenneth Rundt for help on testing in several hosts and pointing out a lot of
+failures and helping to solve them. We are almost there...
 
 I am planning to expand this software if some people are interested in it.
 But I am not sure if anyone is still developing in Delphi. 
