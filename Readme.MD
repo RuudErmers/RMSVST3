@@ -8,7 +8,8 @@ I tried to email and contact RuudErmers, but he hasn't responded.  Rest in peace
 - fixed [dcc32 Warning] W1030 Invalid compiler directive: 'true' by changing it to 'Debug Information'
 - remove .local as it does not need to be tracked in git
 
---------- RuudErmers---R.I.P.-----------------
+# --------- RuudErmers---R.I.P.-----------------
+
 This is a Delphi translation of the VST3 Protocol.
 In fact, it is also an implementation for Fruityplug.
 It supports many of the VST3 aspects, but not all.
