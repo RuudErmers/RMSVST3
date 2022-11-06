@@ -11,7 +11,6 @@ object FormMyVST: TFormMyVST
   Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 120
@@ -43,6 +42,13 @@ object FormMyVST: TFormMyVST
     Width = 67
     Height = 16
     Caption = 'Pulse Width'
+  end
+  object RMCKeyboard1: TRMCKeyboard
+    Left = 32
+    Top = 224
+    Width = 600
+    Height = 90
+    Octaves = 3
   end
   object ScrollBar1: TScrollBar
     Left = 136

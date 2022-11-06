@@ -20,6 +20,7 @@ type
     ScrollBar2: TScrollBar;
     ScrollBar3: TScrollBar;
     Button1: TButton;
+    RMCKeyboard1: TRMCKeyboard;
     procedure ScrollBar1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
