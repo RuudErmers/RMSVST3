@@ -1,4 +1,4 @@
-unit UCodeSiteLogger;
+unit ULogger;    // renamed from UCodeSiteLogger
 
 interface
 
@@ -6,8 +6,9 @@ procedure WriteLog(s:string);
 
 implementation
 
-uses Windows,CodeSiteLogging, System.IOUtils, Classes, SysUtils;
+uses Windows, System.IOUtils, Classes, SysUtils;       // Not everyone has CodeSiteLogging (removed)
 
+{  removed ... not sure what to do with this code yet.
 VAR FlastCheck:Int64;
     FLastResult:boolean;
 function Enabled:boolean;
@@ -30,15 +31,16 @@ begin
     sl.Free;
   end;
   result:=FLastResult;
-end;
+end;  }
 
 
 procedure WriteLog(s:string);
 begin
-//  if not Enabled then exit;
-  CodeSite.Send(s);
+  // do nothing for now
+  //  if not Enabled then exit;
+  //CodeSite.Send(s);
 end;
 
 begin
-  FLastResult:=true;
+  //FLastResult:=true;
 end.
