@@ -51,7 +51,7 @@ implementation
 
 { CUnitInfo }
 
-uses UCodeSiteLogger, UVST3Utils;
+uses ULogger, UVST3Utils;
 
 constructor CUnitInfo.Create(const Controller: IVST3Controller);
 begin

@@ -27,7 +27,7 @@ implementation
 
 { CAudioProcessor }
 
-uses UCodeSiteLogger, SysUtils, UVSTBase;
+uses ULogger, SysUtils, UVSTBase;
 
 function CAudioProcessor.CanProcessSampleSize( symbolicSampleSize: int32): TResult;
 begin

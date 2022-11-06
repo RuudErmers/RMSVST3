@@ -44,7 +44,7 @@ type
 
 implementation
 
-uses UCodeSiteLogger,SysUtils;
+uses ULogger,SysUtils;
 
 procedure TVST3Processor.TempoChanged(tempo: single);
 begin

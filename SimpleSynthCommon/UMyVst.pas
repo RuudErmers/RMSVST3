@@ -30,7 +30,7 @@ implementation
 
 { TmyVST }
 
-uses UMyVSTForm,SysUtils,Windows,UCodeSiteLogger;
+uses UMyVSTForm,SysUtils,Windows,ULogger;
 
 {$POINTERMATH ON}
 {$define DebugLog}

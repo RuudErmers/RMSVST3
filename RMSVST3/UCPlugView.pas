@@ -51,7 +51,7 @@ public
 
 implementation
 
-uses UCodeSiteLogger,UVST3Utils,SysUtils, Windows;
+uses ULogger,UVST3Utils,SysUtils, Windows;
 
 { CPlugView }
 

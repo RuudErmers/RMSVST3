@@ -60,7 +60,7 @@ implementation
 
 { CEditController }
 
-uses UCodeSiteLogger,SysUtils,UVST3Utils;
+uses ULogger,SysUtils,UVST3Utils;
 
 constructor CEditController.Create(const Controller: IVST3Controller);
 begin

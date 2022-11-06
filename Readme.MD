@@ -1,3 +1,15 @@
+# Delphi 11.0
+
+I tried to email and contact RuudErmers, but he hasn't responded.  Rest in peace, RuudErmers.
+
+## 11/6/2022
+- Not everyone has CodeSiteLogging (removed / replaced with ULogger)
+- renamed UCodeSiteLogger to ULogger
+- fixed [dcc32 Warning] W1030 Invalid compiler directive: 'true' by changing it to 'Debug Information'
+- remove .local as it does not need to be tracked in git
+
+# --------- RuudErmers-------------------
+
 This is a Delphi translation of the VST3 Protocol.
 In fact, it is also an implementation for Fruityplug.
 It supports many of the VST3 aspects, but not all.

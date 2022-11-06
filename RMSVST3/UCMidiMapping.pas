@@ -12,7 +12,7 @@ end;
 
 implementation
 
-uses UCodeSiteLogger;
+uses ULogger;
 
 constructor CMidiMapping.Create(const Controller: IVST3Controller);
 begin
