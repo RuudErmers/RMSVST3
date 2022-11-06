@@ -97,7 +97,7 @@ function  ReadStream(stream:IBStream;magic:integer):string;
 
 VAR buffer:TBytes;
 
-    s:string;
+    //s:string;     // declared but not used
     i,l:integer;
 begin
   stream.read(@l,sizeof(integer));

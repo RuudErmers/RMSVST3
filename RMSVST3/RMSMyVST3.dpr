@@ -22,7 +22,7 @@ uses
   UPianoKeyboard in '..\SimpleSynthCommon\UPianoKeyboard.pas',
   UMyVstDSP in '..\SimpleSynthCommon\UMyVstDSP.pas',
   Vst3Base in 'Vst3Base.pas',
-  UCodeSiteLogger in '..\FrameworkCommon\UCodeSiteLogger.pas';
+  ULogger in '..\FrameworkCommon\ULogger.pas';
 
 function InitDLL:boolean; cdecl; export;
 begin

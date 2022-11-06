@@ -125,7 +125,7 @@ type TVST3Parameter  = record
 
 implementation
 
-uses SysUtils,UCodeSiteLogger,Windows,Math, UVst3Utils;
+uses SysUtils,ULogger,Windows,Math, UVst3Utils;
 
 constructor TVST3Controller.Create;
 begin
@@ -140,7 +140,7 @@ begin
 end;
 
 function TVST3Controller.GetEditorState:string;
-VAR i,n:integer;
+VAR i:integer;  // n was declared but not used, so I removed it.
     sl,ssl:TDataLayer;
 begin
   saveCurrentToProgram(FCurProgram);

@@ -41,7 +41,7 @@ implementation
 
 { CComponent }
 
-uses UCodeSiteLogger,UVST3Utils;
+uses ULogger,UVST3Utils;
 
 function CComponent.ActivateBus(vType: TMediaType; dir: TBusDirection;  index: int32; state: TBool): TResult;
 begin
