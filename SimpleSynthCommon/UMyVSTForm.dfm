@@ -43,13 +43,6 @@ object FormMyVST: TFormMyVST
     Height = 16
     Caption = 'Pulse Width'
   end
-  object RMCKeyboard1: TRMCKeyboard
-    Left = 32
-    Top = 224
-    Width = 600
-    Height = 90
-    Octaves = 3
-  end
   object ScrollBar1: TScrollBar
     Left = 136
     Top = 48
