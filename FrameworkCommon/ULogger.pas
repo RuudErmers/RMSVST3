@@ -1,3 +1,10 @@
+{
+  I've put it on the forums Delphi Praxis and stackoverflow asking how to bypass CodeSiteLogging
+  if the person doesn't have it.  I'm waiting on a answer for updating this source.
+
+  For now, I've re-added it back as I think it will be necessary to help improve the code.
+}
+
 unit ULogger;    // renamed from UCodeSiteLogger
 
 interface
@@ -6,9 +13,10 @@ procedure WriteLog(s:string);
 
 implementation
 
-uses Windows, System.IOUtils, Classes, SysUtils;       // Not everyone has CodeSiteLogging (removed)
+uses Windows, System.IOUtils, Classes, SysUtils, CodeSiteLogging;       // Not everyone has CodeSiteLogging -- working on a way to make this optional
+                                                                        // for now, if you get this... just comment it out if you don't have CodeSiteLogging
 
-{  removed ... not sure what to do with this code yet.
+// Comment this below out if you don't have CodeSiteLogging:
 VAR FlastCheck:Int64;
     FLastResult:boolean;
 function Enabled:boolean;
@@ -31,16 +39,18 @@ begin
     sl.Free;
   end;
   result:=FLastResult;
-end;  }
+end;
+// Comment this above out if you don't have CodeSiteLogging
 
 
 procedure WriteLog(s:string);
 begin
-  // do nothing for now
   //  if not Enabled then exit;
-  //CodeSite.Send(s);
+  // Comment the next line out if you don't have CodeSiteLogging:
+  CodeSite.Send(s);
 end;
 
 begin
-  //FLastResult:=true;
+  // Comment the next line out if you don't have CodeSiteLogging:
+  FLastResult:=true;
 end.

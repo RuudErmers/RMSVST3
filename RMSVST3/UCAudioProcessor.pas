@@ -47,7 +47,7 @@ end;
 
 function CAudioProcessor.GetBusArrangement(dir: TBusDirection; index: int32;  var arr: TSpeakerArrangement): TResult;
 begin
-  WriteLog('CAudioProcessor.GetBusArrangement');
+  //WriteLog('CAudioProcessor.GetBusArrangement');
   arr:=3; //
 (* JUCE Version
         if (auto* bus = pluginInstance->getBus (dir == Vst::kInput, index))

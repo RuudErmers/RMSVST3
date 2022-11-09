@@ -20,6 +20,7 @@ type
     ScrollBar2: TScrollBar;
     ScrollBar3: TScrollBar;
     Button1: TButton;
+    Label5: TLabel;
     procedure ScrollBar1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);

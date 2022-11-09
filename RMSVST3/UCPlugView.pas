@@ -169,9 +169,21 @@ end;
 function CPlugView.SetFrame(frame: IPlugFrame): TResult;
 begin
   WriteLog('CPlugView.SetFrame');
-  FFrame:= frame;
-  FFrame._AddRef;
-  result:=kResultOk;
+  if frame = nil then
+  begin
+    WriteLog('CPlugView.SetFrame / frame = nil');
+    WriteLog('IVST3.EditClose');
+    IVST3.EditClose;
+    //FFrame._Release;
+    WriteLog('result:=kResultOk');
+    result:=kResultOk;
+  end
+  else
+  begin
+    FFrame:= frame;
+    FFrame._AddRef;
+    result:=kResultOk;
+  end;
 end;
 
 end.

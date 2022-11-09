@@ -1,5 +1,11 @@
 # Delphi 11.0
 
+## 11/9/2022
+- Added CodeSiteLogging back into the source code
+You can download CodeSiteLogging Express for free from GetIt Package Manager
+
+- Fixed crash when closing the VST instrument window
+
 ## 11/6/2022
 - Not everyone has CodeSiteLogging (removed / replaced with ULogger)
 - renamed UCodeSiteLogger to ULogger

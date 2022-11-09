@@ -43,6 +43,13 @@ object FormMyVST: TFormMyVST
     Height = 16
     Caption = 'Pulse Width'
   end
+  object Label5: TLabel
+    Left = 32
+    Top = 8
+    Width = 47
+    Height = 16
+    Caption = 'MyVST3'
+  end
   object ScrollBar1: TScrollBar
     Left = 136
     Top = 48
