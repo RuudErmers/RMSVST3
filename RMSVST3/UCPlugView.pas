@@ -80,8 +80,8 @@ end;
 
 function CPlugView.CanResize: TResult;
 begin
-  WriteLog('CPlugView.CanResize');
-  result:=kResultOk;
+  //WriteLog('CPlugView.CanResize');   // this can Log SPAM // turn on at own risk
+  result:=kResultFalse;    // was kResultOk kResultFalse
 end;
 
 function CPlugView.CheckSizeConstraint(rect: PViewRect): TResult;
