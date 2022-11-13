@@ -1,5 +1,11 @@
 # Delphi 11.0
 
+Delphi for VST3
+[![Athena for VST3](https://steinbergmedia.github.io/vst3_dev_portal/resources/licensing_3.png)](https://github.com/War3Evo/RMSVST3)
+
+## 11/12/2022
+- The create of Athena for VST3 started.
+
 ## 11/9/2022
 - Added CodeSiteLogging back into the source code
 You can download CodeSiteLogging Express for free from GetIt Package Manager
