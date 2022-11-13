@@ -1,6 +1,7 @@
 # Delphi 11.0
 
-### Athena for VST3 Roadmap
+### Athena for VST3 Roadmap 11/12/2022
+- Testing and Development in Cakewalk by Bandlabs
 - Suggest Chords based on music theory
 - Able to use basic synth or pick a channel for your own synth
 - Sync with DAW

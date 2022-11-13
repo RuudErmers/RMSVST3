@@ -67,6 +67,15 @@ object FormAthenaVST: TFormAthenaVST
     ExplicitTop = 96
     ExplicitWidth = 665
   end
+  object Label6: TLabel
+    Left = 480
+    Top = 676
+    Width = 595
+    Height = 16
+    Caption = 
+      'VST'#174' is a trademark of Steinberg Media Technologies GmbH, regist' +
+      'ered in Europe and other countries.'
+  end
   object ScrollBar1: TScrollBar
     Left = 152
     Top = 400

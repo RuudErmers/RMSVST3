@@ -22,6 +22,7 @@ type
     Button1: TButton;
     Label5: TLabel;
     Fkeyboard: TRMCKeyboard;
+    Label6: TLabel;
     procedure ScrollBar1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
