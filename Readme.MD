@@ -1,10 +1,15 @@
 # Delphi 11.0
 
-Delphi for VST3
-[![Athena for VST3](https://steinbergmedia.github.io/vst3_dev_portal/resources/licensing_3.png)](https://github.com/War3Evo/RMSVST3)
+### Athena for VST3 Roadmap
+- Suggest Chords based on music theory
+- Able to use basic synth or pick a channel for your own synth
+- Sync with DAW
+- Drag and Drop Chords to DAW or Chords Editor
+- Customizable Chord suggestions database with strength indicator
+- Ideas are welcomed: https://github.com/War3Evo/RMSVST3/discussions/categories/ideas
 
 ## 11/12/2022
-- The create of Athena for VST3 started.
+- Created folder for Athena for VST3.  (currently just a synth copy)
 
 ## 11/9/2022
 - Added CodeSiteLogging back into the source code
@@ -18,6 +23,8 @@ You can download CodeSiteLogging Express for free from GetIt Package Manager
 - fixed [dcc32 Warning] W1030 Invalid compiler directive: 'true' by changing it to 'Debug Information'
 - remove .local as it does not need to be tracked in git
 - added gitignore
+
+[![Athena for VST3](https://steinbergmedia.github.io/vst3_dev_portal/resources/licensing_3.png)](https://github.com/War3Evo/RMSVST3)
 
 # --------- RuudErmers-------------------
 
