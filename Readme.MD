@@ -1,6 +1,4 @@
-# Delphi 11.0
-
-I tried to email and contact RuudErmers, but he hasn't responded.  Rest in peace, RuudErmers.
+CLAP version coming soon...
 
 ## 11/6/2022
 - Not everyone has CodeSiteLogging (removed / replaced with ULogger)
